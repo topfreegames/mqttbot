@@ -1,7 +1,5 @@
 package app
 
-import ()
-
 type ChatHandler struct {
 	Plugins *Plugins
 }

@@ -2,10 +2,11 @@ package app
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/kataras/iris"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
-	"strings"
 )
 
 type App struct {
