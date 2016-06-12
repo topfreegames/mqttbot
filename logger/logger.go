@@ -1,4 +1,4 @@
-package app
+package logger
 
 import (
 	"github.com/op/go-logging"
