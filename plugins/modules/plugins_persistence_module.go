@@ -2,12 +2,13 @@ package modules
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/yuin/gopher-lua"
 	"gopkg.in/olivere/elastic.v3"
-	"os"
-	"strings"
 )
 
 var esClient *elastic.Client
@@ -51,7 +52,6 @@ func loadConfiguration() {
 }
 
 func configureDatabase() {
-	//TODO load mappings from config
 	logger.Logger.Debug(fmt.Sprintf("Connecting to elasticsearch @ http://%s:%d", config.GetString("es.host"), config.GetInt("es.port")))
 	client, err := elastic.NewClient(
 		elastic.SetURL(fmt.Sprintf("http://%s:%d", config.GetString("es.host"), config.GetInt("es.port"))),

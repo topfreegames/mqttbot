@@ -3,7 +3,7 @@ plugins:
   mappings:
     - topic: '/chat/#'
       messagePattern: '.*'
-      plugin: 'persist_message.lua'
+      pluginPath: 'persist_message.lua'
     - topic: '/mqttbot/history/#'
       messagePattern: 'history'
-      plugin: 'send_history.lua'
+      pluginPath: 'send_history.lua'

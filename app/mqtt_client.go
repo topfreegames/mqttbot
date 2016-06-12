@@ -2,11 +2,12 @@ package app
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/yosssi/gmq/mqtt"
 	"github.com/yosssi/gmq/mqtt/client"
-	"os"
 )
 
 type MqttClient struct {

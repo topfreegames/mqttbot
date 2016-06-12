@@ -1,9 +1,10 @@
 package models
 
 import (
-	"gopkg.in/olivere/elastic.v3"
 	"strconv"
 	"time"
+
+	"gopkg.in/olivere/elastic.v3"
 )
 
 type Message struct {
