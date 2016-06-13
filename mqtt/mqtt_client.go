@@ -3,17 +3,18 @@ package mqttclient
 import (
 	"fmt"
 	"sync"
+	"time"
 
+	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
-	"github.com/yosssi/gmq/mqtt/client"
 )
 
 type MqttClient struct {
 	MqttServerHost string
 	MqttServerPort int
 	ConfigPath     string
-	MqttClient     *client.Client
+	MqttClient     mqtt.Client
 }
 
 var Client *MqttClient
@@ -21,7 +22,7 @@ var once sync.Once
 
 func GetMqttClient() *MqttClient {
 	once.Do(func() {
-		Client := &MqttClient{}
+		Client = &MqttClient{}
 		Client.configure()
 	})
 	return Client
@@ -46,23 +47,17 @@ func (c *MqttClient) configureClient() {
 
 func (mc *MqttClient) start() {
 	logger.Logger.Debug("Initializing mqtt client")
-	mc.MqttClient = client.New(&client.Options{
-		ErrorHandler: func(err error) {
-			logger.Logger.Error(err)
-		},
-	})
+
+	opts := mqtt.NewClientOptions().AddBroker(fmt.Sprintf("tcp://%s:%d", mc.MqttServerHost, mc.MqttServerPort)).SetClientID("mqttbot")
+	opts.SetKeepAlive(2 * time.Second)
+	opts.SetPingTimeout(1 * time.Second)
+	mc.MqttClient = mqtt.NewClient(opts)
 
 	c := mc.MqttClient
 
-	defer c.Terminate()
-	err := c.Connect(&client.ConnectOptions{
-		Network:  "tcp",
-		Address:  fmt.Sprintf("%s:%d", mc.MqttServerHost, mc.MqttServerPort),
-		ClientID: []byte("mqttbot-client"),
-	})
-
-	if err != nil {
-		logger.Logger.Fatal("Error connecting to mqtt server! err:", err)
+	if token := c.Connect(); token.Wait() && token.Error() != nil {
+		logger.Logger.Fatal(token.Error())
 	}
+
 	logger.Logger.Info(fmt.Sprintf("Successfully connected to mqtt server at %s:%d!", mc.MqttServerHost, mc.MqttServerPort))
 }

@@ -1,18 +1,20 @@
 package bot
 
 import (
+	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/mqtt"
 	"github.com/topfreegames/mqttbot/plugins"
-	"github.com/yosssi/gmq/mqtt"
-	"github.com/yosssi/gmq/mqtt/client"
 )
 
 type MqttBot struct {
 	Plugins         *plugins.Plugins
 	PluginsMappings []map[string]string
 	Client          *mqttclient.MqttClient
+}
+
+var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 func GetMqttBot() *MqttBot {
@@ -27,33 +29,15 @@ func (b *MqttBot) setupPlugins() {
 	b.Plugins.SetupPlugins()
 }
 
-func getQosFromInt(qosInt int) byte {
-	switch qosInt {
-	case 0:
-		return mqtt.QoS0
-	case 1:
-		return mqtt.QoS1
-	case 2:
-		return mqtt.QoS2
-	default:
-		return mqtt.QoS2
-	}
-}
-
 func (b *MqttBot) StartBot() {
 	subscriptions := viper.Get("mqttserver.subscriptionRequests").([]interface{})
-	subscriptionsOptions := &client.SubscribeOptions{SubReqs: []*client.SubReq{}}
+	client := b.Client.MqttClient
 	for _, s := range subscriptions {
 		sMap := s.(map[interface{}]interface{})
-		//pluginsMap := sMap[string("plugins")].([]interface{})
-
-		subscriptionReq := &client.SubReq{
-			TopicFilter: []byte(sMap[string("topic")].(string)),
-			QoS:         getQosFromInt(sMap[string("qos")].(int)),
-			Handler: func(topicName, message []byte) {
-			},
+		qos := sMap[string("qos")].(int)
+		if token := client.Subscribe(sMap[string("topic")].(string), uint8(qos), h); token.Wait() && token.Error() != nil {
+			logger.Logger.Fatal(token.Error())
 		}
-		subscriptionsOptions.SubReqs = append(subscriptionsOptions.SubReqs, subscriptionReq)
 	}
 
 	logger.Logger.Debug("Successfully subscribed to mqtt topics matching patterns /chat/# and /bot/history/#")
