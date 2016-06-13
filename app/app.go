@@ -7,15 +7,15 @@ import (
 	"github.com/kataras/iris"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
-	"github.com/topfreegames/mqttbot/mqtt"
+	"github.com/topfreegames/mqttbot/mqtt/bot"
 )
 
 type App struct {
-	Debug      bool
-	Port       int
-	Host       string
-	Api        *iris.Iris
-	MqttClient *mqtt.MqttClient
+	Debug   bool
+	Port    int
+	Host    string
+	Api     *iris.Iris
+	MqttBot *bot.MqttBot
 }
 
 func GetApp(host string, port int, debug bool) *App {
@@ -51,7 +51,8 @@ func (app *App) loadConfiguration() {
 }
 
 func (app *App) configureApplication() {
-	app.MqttClient = mqtt.GetMqttClient()
+	app.MqttBot = bot.GetMqttBot()
+	app.MqttBot.StartBot()
 	app.Api = iris.New()
 	a := app.Api
 

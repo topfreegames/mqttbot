@@ -16,12 +16,12 @@ var esClient *elastic.Client
 func PersistenceModuleLoader(L *lua.LState) int {
 	configurePersistenceModule()
 	configureDatabase()
-	mod := L.SetFuncs(L.NewTable(), exports)
+	mod := L.SetFuncs(L.NewTable(), persistenceModuleExports)
 	L.Push(mod)
 	return 1
 }
 
-var exports = map[string]lua.LGFunction{
+var persistenceModuleExports = map[string]lua.LGFunction{
 	"index_message":  IndexMessage,
 	"query_messages": QueryMessages,
 }
@@ -44,8 +44,7 @@ func configureDatabase() {
 		elastic.SetSniff(viper.GetBool("elasticsearch.sniff")),
 	)
 	if err != nil {
-		logger.Logger.Error("Failed to connect to elasticsearch! err:", err)
-		os.Exit(1)
+		logger.Logger.Fatal("Failed to connect to elasticsearch! err:", err)
 	}
 	logger.Logger.Info(fmt.Sprintf("Successfully connected to elasticsearch @ http://%s:%d", viper.GetString("elasticsearch.host"), viper.GetInt("elasticsearch.port")))
 	logger.Logger.Debug("Creating index chat into ES")
