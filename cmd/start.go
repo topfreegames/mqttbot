@@ -18,7 +18,6 @@ var startCmd = &cobra.Command{
 		app := app.GetApp(
 			host,
 			port,
-			cfgFile,
 			debug,
 		)
 		app.Start()

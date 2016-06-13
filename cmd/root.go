@@ -28,8 +28,9 @@ func Execute(cmd *cobra.Command) {
 func init() {
 	RootCmd.PersistentFlags().StringVarP(
 		&cfgFile, "config", "c", "./config/local.yaml",
-		"config file (default is ./config/local.yaml",
+		"config file (default is ./config/local.yaml)",
 	)
+	initConfig()
 }
 
 func initConfig() {

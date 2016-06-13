@@ -14,21 +14,17 @@ type App struct {
 	Debug      bool
 	Port       int
 	Host       string
-	ConfigPath string
 	Api        *iris.Iris
 	MqttClient *mqtt.MqttClient
-	Config     *viper.Viper
 }
 
-func GetApp(host string, port int, configPath string, debug bool) *App {
+func GetApp(host string, port int, debug bool) *App {
 	logger.SetupLogger()
-	logger.Logger.Debug(fmt.Sprintf("Starting app with host: %s, port: %d, configFile: %s", host, port, configPath))
+	logger.Logger.Debug(fmt.Sprintf("Starting app with host: %s, port: %d, configFile: %s", host, port, viper.ConfigFileUsed()))
 	app := &App{
-		Host:       host,
-		Port:       port,
-		ConfigPath: configPath,
-		Config:     viper.New(),
-		Debug:      debug,
+		Host:  host,
+		Port:  port,
+		Debug: debug,
 	}
 	app.Configure()
 	return app
@@ -41,17 +37,16 @@ func (app *App) Configure() {
 }
 
 func (app *App) setConfigurationDefaults() {
-	app.Config.SetDefault("healthcheck.workingText", "WORKING")
+	viper.SetDefault("healthcheck.workingText", "WORKING")
 }
 
 func (app *App) loadConfiguration() {
-	app.Config.SetConfigFile(app.ConfigPath)
-	app.Config.SetEnvPrefix("mqttbot")
-	app.Config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	app.Config.AutomaticEnv()
+	viper.SetEnvPrefix("mqttbot")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv()
 
-	if err := app.Config.ReadInConfig(); err == nil {
-		logger.Logger.Debug(fmt.Sprintf("Using config file: %s", app.Config.ConfigFileUsed()))
+	if err := viper.ReadInConfig(); err == nil {
+		logger.Logger.Debug(fmt.Sprintf("Using config file: %s", viper.ConfigFileUsed()))
 	}
 }
 
