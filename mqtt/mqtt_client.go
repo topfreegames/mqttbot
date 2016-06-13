@@ -1,8 +1,10 @@
-package app
+package mqtt
 
 import (
 	"fmt"
 	"os"
+	"strings"
+	"sync"
 
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
@@ -14,21 +16,54 @@ type MqttClient struct {
 	MqttServerHost string
 	MqttServerPort int
 	ConfigPath     string
-	Config         *viper.Viper
 	MqttClient     *client.Client
+	Config         *viper.Viper
 	ChatHandler    *ChatHandler
 }
 
-func GetMqttClient(mqttServerHost string, mqttServerPort int) *MqttClient {
-	mqttClient := &MqttClient{
-		MqttServerHost: mqttServerHost,
-		MqttServerPort: mqttServerPort,
-	}
-	mqttClient.ChatHandler = GetChatHandler()
-	return mqttClient
+var Client *MqttClient
+var once sync.Once
+
+func GetMqttClient() *MqttClient {
+	once.Do(func() {
+		Client := &MqttClient{
+			Config: viper.New(),
+		}
+		Client.ChatHandler = GetChatHandler()
+		Client.configure()
+	})
+	return Client
 }
 
-func (m *MqttClient) Start() {
+func (c *MqttClient) configure() {
+	c.setConfigurationDefaults()
+	c.loadConfiguration()
+	c.configureClient()
+	c.start()
+}
+
+func (c *MqttClient) setConfigurationDefaults() {
+	c.Config.SetDefault("mqttserver.host", "localhost")
+	c.Config.SetDefault("mqttserver.port", 1883)
+}
+
+func (c *MqttClient) loadConfiguration() {
+	c.Config.SetConfigFile("./config/mqtt.yaml")
+	c.Config.SetEnvPrefix("mqttbot.mqtt")
+	c.Config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	c.Config.AutomaticEnv()
+
+	if err := c.Config.ReadInConfig(); err == nil {
+		logger.Logger.Debug(fmt.Sprintf("Using config file: %s", c.Config.ConfigFileUsed()))
+	}
+}
+
+func (c *MqttClient) configureClient() {
+	c.MqttServerHost = c.Config.GetString("mqttserver.host")
+	c.MqttServerPort = c.Config.GetInt("mqttserver.port")
+}
+
+func (m *MqttClient) start() {
 	logger.Logger.Debug("Initializing mqtt client")
 	m.MqttClient = client.New(&client.Options{
 		ErrorHandler: func(err error) {

@@ -1,6 +1,4 @@
 ---
 healthcheck:
   workingText: "WORKING"
-mqttserver:
-  host: "localhost"
-  port: 1883
+

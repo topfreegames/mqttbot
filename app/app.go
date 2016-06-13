@@ -7,6 +7,7 @@ import (
 	"github.com/kataras/iris"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
+	"github.com/topfreegames/mqttbot/mqtt"
 )
 
 type App struct {
@@ -15,7 +16,7 @@ type App struct {
 	Host       string
 	ConfigPath string
 	Api        *iris.Iris
-	MqttClient *MqttClient
+	MqttClient *mqtt.MqttClient
 	Config     *viper.Viper
 }
 
@@ -41,8 +42,6 @@ func (app *App) Configure() {
 
 func (app *App) setConfigurationDefaults() {
 	app.Config.SetDefault("healthcheck.workingText", "WORKING")
-	app.Config.SetDefault("mqttserver.host", "localhost")
-	app.Config.SetDefault("mqttserver.port", 1883)
 }
 
 func (app *App) loadConfiguration() {
@@ -57,7 +56,7 @@ func (app *App) loadConfiguration() {
 }
 
 func (app *App) configureApplication() {
-	app.MqttClient = GetMqttClient(app.Config.GetString("mqttserver.host"), app.Config.GetInt("mqttserver.port"))
+	app.MqttClient = mqtt.GetMqttClient()
 	app.Api = iris.New()
 	a := app.Api
 
@@ -65,6 +64,5 @@ func (app *App) configureApplication() {
 }
 
 func (app *App) Start() {
-	app.MqttClient.Start()
 	app.Api.Listen(fmt.Sprintf("%s:%d", app.Host, app.Port))
 }

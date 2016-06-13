@@ -17,7 +17,7 @@ var RootCmd = &cobra.Command{
 	Long:  `Use mqttbot to spy on your mqtt topics, persist all its messages and act like a bot`,
 }
 
-//Execute runs RootCmd to initialize khan CLI application
+//Execute runs RootCmd to initialize mqttbot CLI application
 func Execute(cmd *cobra.Command) {
 	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
