@@ -1,0 +1,13 @@
+---
+mqttserver:
+  host: "localhost"
+  port: 1883
+  subscriptions:
+    - topic: '/chat/#'
+      plugins:
+        - plugin: "persist_message"
+          messagePattern: ".*"
+    - topic: '/mqttbot/history/#'
+      plugins:
+        - plugin: "send_history"
+          messagePattern: "history"

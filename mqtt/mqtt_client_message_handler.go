@@ -1,7 +1,11 @@
-package app
+package mqtt
+
+import (
+	"github.com/topfreegames/mqttbot/plugins"
+)
 
 type ChatHandler struct {
-	Plugins *Plugins
+	Plugins *plugins.Plugins
 }
 
 type ChatMessage struct {
@@ -11,7 +15,7 @@ type ChatMessage struct {
 
 func GetChatHandler() *ChatHandler {
 	handler := &ChatHandler{
-		Plugins: GetPlugins(),
+		Plugins: plugins.GetPlugins(),
 	}
 	p := handler.Plugins
 	p.SetupPlugins()
