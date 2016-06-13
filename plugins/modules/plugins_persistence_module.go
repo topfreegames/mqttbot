@@ -12,10 +12,8 @@ import (
 )
 
 var esClient *elastic.Client
-var config *viper.Viper
 
 func PersistenceModuleLoader(L *lua.LState) int {
-	config = viper.New()
 	configurePersistenceModule()
 	configureDatabase()
 	mod := L.SetFuncs(L.NewTable(), exports)
@@ -30,41 +28,29 @@ var exports = map[string]lua.LGFunction{
 
 func configurePersistenceModule() {
 	setConfigurationDefaults()
-	loadConfiguration()
 }
 
 func setConfigurationDefaults() {
-	config.SetDefault("es.host", "localhost")
-	config.SetDefault("es.port", 9200)
-	config.SetDefault("es.sniff", false)
-	config.SetDefault("es.indexMappings", map[string]string{})
-}
-
-func loadConfiguration() {
-	config.SetConfigFile("./config/elasticsearch.yaml")
-	config.SetEnvPrefix("mqttbot.persistence")
-	config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	config.AutomaticEnv()
-
-	if err := config.ReadInConfig(); err == nil {
-		logger.Logger.Debug(fmt.Sprintf("Using config file: %s", config.ConfigFileUsed()))
-	}
+	viper.SetDefault("elasticsearch.host", "localhost")
+	viper.SetDefault("elasticsearch.port", 9200)
+	viper.SetDefault("elasticsearch.sniff", false)
+	viper.SetDefault("elasticsearch.indexMappings", map[string]string{})
 }
 
 func configureDatabase() {
-	logger.Logger.Debug(fmt.Sprintf("Connecting to elasticsearch @ http://%s:%d", config.GetString("es.host"), config.GetInt("es.port")))
+	logger.Logger.Debug(fmt.Sprintf("Connecting to elasticsearch @ http://%s:%d", viper.GetString("elasticsearch.host"), viper.GetInt("elasticsearch.port")))
 	client, err := elastic.NewClient(
-		elastic.SetURL(fmt.Sprintf("http://%s:%d", config.GetString("es.host"), config.GetInt("es.port"))),
-		elastic.SetSniff(config.GetBool("es.sniff")),
+		elastic.SetURL(fmt.Sprintf("http://%s:%d", viper.GetString("elasticsearch.host"), viper.GetInt("elasticsearch.port"))),
+		elastic.SetSniff(viper.GetBool("elasticsearch.sniff")),
 	)
 	if err != nil {
 		logger.Logger.Error("Failed to connect to elasticsearch! err:", err)
 		os.Exit(1)
 	}
-	logger.Logger.Info(fmt.Sprintf("Successfully connected to elasticsearch @ http://%s:%d", config.GetString("es.host"), config.GetInt("es.port")))
+	logger.Logger.Info(fmt.Sprintf("Successfully connected to elasticsearch @ http://%s:%d", viper.GetString("elasticsearch.host"), viper.GetInt("elasticsearch.port")))
 	logger.Logger.Debug("Creating index chat into ES")
 
-	indexes := config.GetStringMapString("es.indexMappings")
+	indexes := viper.GetStringMapString("elasticsearch.indexMappings")
 	for index, mappings := range indexes {
 		_, err = client.CreateIndex(index).Body(mappings).Do()
 		if err != nil {

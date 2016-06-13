@@ -3,7 +3,6 @@ package mqtt
 import (
 	"fmt"
 	"os"
-	"strings"
 	"sync"
 
 	"github.com/spf13/viper"
@@ -13,12 +12,21 @@ import (
 )
 
 type MqttClient struct {
-	MqttServerHost string
-	MqttServerPort int
-	ConfigPath     string
-	MqttClient     *client.Client
-	Config         *viper.Viper
-	ChatHandler    *ChatHandler
+	MqttServerHost  string
+	MqttServerPort  int
+	ConfigPath      string
+	MqttClient      *client.Client
+	PluginsMappings []map[string]string
+}
+
+type subscriptionStruct struct {
+	topic   string
+	qos     int
+	plugins []map[string]string
+}
+
+type subscriptionsStruct struct {
+	Subscriptions []subscriptionStruct
 }
 
 var Client *MqttClient
@@ -26,10 +34,7 @@ var once sync.Once
 
 func GetMqttClient() *MqttClient {
 	once.Do(func() {
-		Client := &MqttClient{
-			Config: viper.New(),
-		}
-		Client.ChatHandler = GetChatHandler()
+		Client := &MqttClient{}
 		Client.configure()
 	})
 	return Client
@@ -37,30 +42,32 @@ func GetMqttClient() *MqttClient {
 
 func (c *MqttClient) configure() {
 	c.setConfigurationDefaults()
-	c.loadConfiguration()
 	c.configureClient()
 	c.start()
 }
 
 func (c *MqttClient) setConfigurationDefaults() {
-	c.Config.SetDefault("mqttserver.host", "localhost")
-	c.Config.SetDefault("mqttserver.port", 1883)
-}
-
-func (c *MqttClient) loadConfiguration() {
-	c.Config.SetConfigFile("./config/mqtt.yaml")
-	c.Config.SetEnvPrefix("mqttbot.mqtt")
-	c.Config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	c.Config.AutomaticEnv()
-
-	if err := c.Config.ReadInConfig(); err == nil {
-		logger.Logger.Debug(fmt.Sprintf("Using config file: %s", c.Config.ConfigFileUsed()))
-	}
+	viper.SetDefault("mqttserver.host", "localhost")
+	viper.SetDefault("mqttserver.port", 1883)
+	viper.SetDefault("mqttserver.subscriptions", []map[string]string{})
 }
 
 func (c *MqttClient) configureClient() {
-	c.MqttServerHost = c.Config.GetString("mqttserver.host")
-	c.MqttServerPort = c.Config.GetInt("mqttserver.port")
+	c.MqttServerHost = viper.GetString("mqttserver.host")
+	c.MqttServerPort = viper.GetInt("mqttserver.port")
+}
+
+func getQosFromInt(qosInt int) byte {
+	switch qosInt {
+	case 0:
+		return mqtt.QoS0
+	case 1:
+		return mqtt.QoS1
+	case 2:
+		return mqtt.QoS2
+	default:
+		return mqtt.QoS2
+	}
 }
 
 func (m *MqttClient) start() {
@@ -86,23 +93,20 @@ func (m *MqttClient) start() {
 	}
 	logger.Logger.Info(fmt.Sprintf("Successfully connected to mqtt server at %s:%d!", m.MqttServerHost, m.MqttServerPort))
 
-	err = c.Subscribe(&client.SubscribeOptions{
-		SubReqs: []*client.SubReq{
-			&client.SubReq{
-				TopicFilter: []byte("/chat/#"),
-				QoS:         mqtt.QoS2,
-				Handler: func(topicName, message []byte) {
-				},
+	subscriptions := viper.Get("mqttserver.subscriptions").([]interface{})
+	subscriptionsOptions := &client.SubscribeOptions{SubReqs: []*client.SubReq{}}
+	for _, s := range subscriptions {
+		sMap := s.(map[interface{}]interface{})
+		pluginsMap := sMap[string("plugins")].([]interface{})
+
+		subscriptionReq := &client.SubReq{
+			TopicFilter: []byte(sMap[string("topic")].(string)),
+			QoS:         getQosFromInt(sMap[string("qos")].(int)),
+			Handler: func(topicName, message []byte) {
 			},
-			&client.SubReq{
-				TopicFilter: []byte("/mqttbot/#"),
-				QoS:         mqtt.QoS2,
-				Handler: func(topicName, message []byte) {
-					logger.Logger.Debug(fmt.Sprintf("Bot received message: %s, on topic: %s, serving history", string(message), string(topicName)))
-				},
-			},
-		},
-	})
+		}
+		subscriptionsOptions.SubReqs = append(subscriptionsOptions.SubReqs, subscriptionReq)
+	}
 
 	if err != nil {
 		logger.Logger.Error("Error subscribing to mqtt topics! err:", err)

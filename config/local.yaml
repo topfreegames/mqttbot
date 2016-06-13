@@ -1,4 +1,23 @@
 ---
 healthcheck:
   workingText: "WORKING"
-
+mqttserver:
+  host: "localhost"
+  port: 1883
+  subscriptions:
+    - topic: '/chat/#'
+      qos: 2
+      plugins:
+        - plugin: "persist_message"
+          messagePattern: ".*"
+    - topic: '/mqttbot/history/#'
+      qos: 2
+      plugins:
+        - plugin: "send_history"
+          messagePattern: "history"
+elasticsearch:
+  host: "localhost"
+  port: 9200
+  sniff: false
+  indexMappings:
+    chat: '{ "mappings": { "message": {"_timestamp": { "enabled": true }, "_ttl": { "enabled": true, "default": "2d" }}}}'
