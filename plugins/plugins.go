@@ -1,8 +1,6 @@
 package plugins
 
 import (
-	"os"
-
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/plugins/modules"
 	"github.com/yuin/gopher-lua"
@@ -25,16 +23,15 @@ func (p *Plugins) SetupPlugins() {
 }
 
 func (p *Plugins) loadModules() {
-	L := p.preloadPersistenceModule()
+	L := p.preloadModules()
 	if err := L.DoFile("plugins/load_modules.lua"); err != nil {
-		logger.Logger.Error("Error loading lua go modules, err:", err)
-		os.Exit(1)
+		logger.Logger.Fatal("Error loading lua go modules, err:", err)
 	}
 	p.LState = L
 	logger.Logger.Info("Successfully loaded lua go modules")
 }
 
-func (p *Plugins) preloadPersistenceModule() *lua.LState {
+func (p *Plugins) preloadModules() *lua.LState {
 	L := lua.NewState()
 	defer L.Close()
 	L.PreloadModule("persistence_module", modules.PersistenceModuleLoader)

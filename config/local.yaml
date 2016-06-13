@@ -4,13 +4,13 @@ healthcheck:
 mqttserver:
   host: "localhost"
   port: 1883
-  subscriptions:
-    - topic: '/chat/#'
+  subscriptionRequests:
+    - topic: 'chat/#'
       qos: 2
       plugins:
         - plugin: "persist_message"
           messagePattern: ".*"
-    - topic: '/mqttbot/history/#'
+    - topic: 'mqttbot/history/#'
       qos: 2
       plugins:
         - plugin: "send_history"
