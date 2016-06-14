@@ -8,10 +8,21 @@ import (
 	"github.com/topfreegames/mqttbot/plugins"
 )
 
+type PluginMapping struct {
+	Plugin         string
+	MessagePattern string
+}
+
+type Subscription struct {
+	Topic          string
+	Qos            int
+	PluginMappings []*PluginMapping
+}
+
 type MqttBot struct {
-	Plugins         *plugins.Plugins
-	PluginsMappings []map[string]string
-	Client          *mqttclient.MqttClient
+	Plugins       *plugins.Plugins
+	Subscriptions []*Subscription
+	Client        *mqttclient.MqttClient
 }
 
 var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -32,13 +43,28 @@ func (b *MqttBot) setupPlugins() {
 func (b *MqttBot) StartBot() {
 	subscriptions := viper.Get("mqttserver.subscriptionRequests").([]interface{})
 	client := b.Client.MqttClient
+	b.Subscriptions = make([]*Subscription, len(subscriptions))
 	for _, s := range subscriptions {
 		sMap := s.(map[interface{}]interface{})
 		qos := sMap[string("qos")].(int)
-		if token := client.Subscribe(sMap[string("topic")].(string), uint8(qos), h); token.Wait() && token.Error() != nil {
+		topic := sMap[string("topic")].(string)
+		pluginMapping := sMap[string("plugins")].([]interface{})
+		subscriptionNow := &Subscription{
+			Topic:          topic,
+			Qos:            qos,
+			PluginMappings: make([]*PluginMapping, len(pluginMapping)),
+		}
+		for _, p := range pluginMapping {
+			pMap := p.(map[interface{}]interface{})
+			subscriptionNow.PluginMappings = append(subscriptionNow.PluginMappings, &PluginMapping{
+				Plugin:         pMap[string("plugin")].(string),
+				MessagePattern: pMap[string("messagePattern")].(string),
+			})
+		}
+		if token := client.Subscribe(topic, uint8(qos), h); token.Wait() && token.Error() != nil {
 			logger.Logger.Fatal(token.Error())
 		}
+		b.Subscriptions = append(b.Subscriptions, subscriptionNow)
 	}
-
 	logger.Logger.Debug("Successfully subscribed to mqtt topics matching patterns /chat/# and /bot/history/#")
 }
