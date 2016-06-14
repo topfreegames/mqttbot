@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/layeh/gopher-luar"
 	"github.com/satori/go.uuid"
 	"github.com/topfreegames/mqttbot/es"
 	"github.com/topfreegames/mqttbot/logger"
@@ -79,7 +80,7 @@ func QueryMessages(L *lua.LState) int {
 		L.Push(L.ToNumber(1))
 		return 2
 	}
-	var payloads := []string{}
+	payloads := []PayloadStruct{}
 	var ttyp Message
 	for _, item := range searchResults.Each(reflect.TypeOf(ttyp)) {
 		if t, ok := item.(Message); ok {
@@ -88,6 +89,6 @@ func QueryMessages(L *lua.LState) int {
 		}
 	}
 	L.Push(nil)
-	L.Push(searchResults)
+	L.Push(luar.New(L, payloads))
 	return 2
 }
