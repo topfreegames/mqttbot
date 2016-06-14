@@ -20,4 +20,4 @@ elasticsearch:
   port: 9200
   sniff: false
   indexMappings:
-    chat: '{ "mappings": { "message": {"_timestamp": { "enabled": true }, "_ttl": { "enabled": true, "default": "2d" }}}}'
+    chat: '{ "mappings": { "message":{"_ttl": { "enabled": true, "default": "2d" }}}}'

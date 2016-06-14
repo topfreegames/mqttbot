@@ -1,4 +1,6 @@
-function run_plugin(payload, topic)
+local pm = require 'persistence_module'
 
-  return 0
+function run_plugin(topic, payload)
+  err, ret = pm.index_message(topic, payload)
+  return err, ret
 end
