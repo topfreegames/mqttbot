@@ -1,3 +1,3 @@
-function run_plugin(payload, topic)
+function run_plugin(topic, payload)
   return 0
 end

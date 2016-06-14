@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -48,13 +49,18 @@ func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (err error, succe
 	defer L.Close()
 	if err := L.CallByParam(lua.P{
 		Fn:      L.GetGlobal("run_plugin"),
-		NRet:    1,
+		NRet:    2,
 		Protect: true,
-	}, lua.LString(payload), lua.LString(topic)); err != nil {
+	}, lua.LString(topic), lua.LString(payload)); err != nil {
 		logger.Logger.Error(err)
 		return err, 1
 	}
 	ret := L.Get(-1)
-	L.Pop(1)
+	retErr := L.Get(-2)
+	L.Pop(2)
+	if retErr != nil {
+		logger.Logger.Error(retErr.String())
+		return errors.New(retErr.String()), 1
+	}
 	return nil, int(ret.(lua.LNumber))
 }
