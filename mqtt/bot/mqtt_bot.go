@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"regexp"
 	"strings"
 	"sync"
 
@@ -34,7 +35,12 @@ var once sync.Once
 var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	for _, subscription := range mqttBot.Subscriptions {
 		if RouteIncludesTopic(strings.Split(subscription.Topic, "/"), strings.Split(msg.Topic(), "/")) {
-			//trigger here
+			for _, pluginMapping := range subscription.PluginMappings {
+				match, _ := regexp.Match(pluginMapping.MessagePattern, msg.Payload())
+				if match {
+					//trigger here
+				}
+			}
 		}
 	}
 }
