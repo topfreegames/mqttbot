@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/satori/go.uuid"
 	"github.com/topfreegames/mqttbot/es"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/yuin/gopher-lua"
@@ -12,8 +13,8 @@ import (
 )
 
 type PayloadStruct struct {
-	from    string
-	message string
+	From    string `json:"from"`
+	Message string `json:"message"`
 }
 
 type Message struct {
@@ -47,15 +48,16 @@ func IndexMessage(L *lua.LState) int {
 	L.Pop(2)
 	var message Message
 	json.Unmarshal([]byte(payload.String()), &message)
-	logger.Logger.Debug(fmt.Sprintf("Message received to persist: %s", message))
 	message.Topic = topic.String()
 	message.Date = time.Now()
-	message.Id = "1"
-	logger.Logger.Debug(fmt.Sprintf("Message received to persist: %s", message))
-	//if _, err := ESClient.Index().Index("chat").Type("message").BodyJson(message).Do(); err != nil {
-	//	logger.Logger.Error(err)
-	//	return 1
-	//}
+	message.Id = uuid.NewV4().String()
+	if _, err := ESClient.Index().Index("chat").Type("message").BodyJson(message).Do(); err != nil {
+		logger.Logger.Error(err)
+		L.Push(lua.LString(fmt.Sprint("%s", err)))
+		L.Push(L.ToNumber(1))
+		return 2
+	}
+	logger.Logger.Debug(fmt.Sprint("Message persisted: %s", message))
 	L.Push(nil)
 	L.Push(L.ToNumber(0))
 	return 2
