@@ -1,6 +1,9 @@
 package bot
 
 import (
+	"strings"
+	"sync"
+
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
@@ -25,13 +28,23 @@ type MqttBot struct {
 	Client        *mqttclient.MqttClient
 }
 
+var mqttBot *MqttBot
+var once sync.Once
+
 var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+	for _, subscription := range mqttBot.Subscriptions {
+		if RouteIncludesTopic(strings.Split(subscription.Topic, "/"), strings.Split(msg.Topic(), "/")) {
+			//trigger here
+		}
+	}
 }
 
 func GetMqttBot() *MqttBot {
-	mqttBot := &MqttBot{}
-	mqttBot.Client = mqttclient.GetMqttClient()
-	mqttBot.setupPlugins()
+	once.Do(func() {
+		mqttBot = &MqttBot{}
+		mqttBot.Client = mqttclient.GetMqttClient()
+		mqttBot.setupPlugins()
+	})
 	return mqttBot
 }
 
@@ -43,7 +56,7 @@ func (b *MqttBot) setupPlugins() {
 func (b *MqttBot) StartBot() {
 	subscriptions := viper.Get("mqttserver.subscriptionRequests").([]interface{})
 	client := b.Client.MqttClient
-	b.Subscriptions = make([]*Subscription, len(subscriptions))
+	b.Subscriptions = []*Subscription{}
 	for _, s := range subscriptions {
 		sMap := s.(map[interface{}]interface{})
 		qos := sMap[string("qos")].(int)
@@ -52,7 +65,7 @@ func (b *MqttBot) StartBot() {
 		subscriptionNow := &Subscription{
 			Topic:          topic,
 			Qos:            qos,
-			PluginMappings: make([]*PluginMapping, len(pluginMapping)),
+			PluginMappings: []*PluginMapping{},
 		}
 		for _, p := range pluginMapping {
 			pMap := p.(map[interface{}]interface{})
