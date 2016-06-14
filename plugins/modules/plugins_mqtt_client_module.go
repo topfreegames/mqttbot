@@ -1,12 +1,13 @@
 package modules
 
 import (
+	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/mqtt"
 	"github.com/yuin/gopher-lua"
 )
 
-var mqttClient *mqttclient.MqttClient
+var mqttClient mqtt.Client
 
 func MqttClientModuleLoader(L *lua.LState) int {
 	configureMqttModule()
@@ -20,7 +21,7 @@ var mqttClientModuleExports = map[string]lua.LGFunction{
 }
 
 func configureMqttModule() {
-	mqttClient = mqttclient.GetMqttClient()
+	mqttClient = mqttclient.GetMqttClient().MqttClient
 }
 
 func SendMessage(L *lua.LState) int {
