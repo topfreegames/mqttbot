@@ -52,12 +52,11 @@ func IndexMessage(L *lua.LState) int {
 	message.Date = time.Now()
 	message.Id = uuid.NewV4().String()
 	if _, err := ESClient.Index().Index("chat").Type("message").BodyJson(message).Do(); err != nil {
-		logger.Logger.Error(err)
-		L.Push(lua.LString(fmt.Sprint("%s", err)))
+		L.Push(lua.LString(fmt.Sprintf("%s", err)))
 		L.Push(L.ToNumber(1))
 		return 2
 	}
-	logger.Logger.Debug(fmt.Sprint("Message persisted: %s", message))
+	logger.Logger.Debug(fmt.Sprintf("Message persisted: %s", message))
 	L.Push(nil)
 	L.Push(L.ToNumber(0))
 	return 2
