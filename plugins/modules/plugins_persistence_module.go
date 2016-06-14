@@ -79,11 +79,15 @@ func QueryMessages(L *lua.LState) int {
 		L.Push(L.ToNumber(1))
 		return 2
 	}
+	var payloads := []string{}
 	var ttyp Message
 	for _, item := range searchResults.Each(reflect.TypeOf(ttyp)) {
 		if t, ok := item.(Message); ok {
 			logger.Logger.Debug(fmt.Sprintf("Message: %s\n", t))
+			payloads = append(payloads, t.Payload)
 		}
 	}
-	return 0
+	L.Push(nil)
+	L.Push(searchResults)
+	return 2
 }

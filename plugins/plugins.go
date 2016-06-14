@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/cjoudrey/gluahttp"
+	"github.com/layeh/gopher-json"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/plugins/modules"
 	"github.com/yuin/gopher-lua"
@@ -40,6 +41,7 @@ func (p *Plugins) loadModules(L *lua.LState) {
 	L.PreloadModule("persistence_module", modules.PersistenceModuleLoader)
 	L.PreloadModule("mqttclient_module", modules.MqttClientModuleLoader)
 	L.PreloadModule("http", gluahttp.NewHttpModule(&http.Client{}).Loader)
+	L.PreloadModule("json", json.Loader)
 }
 
 func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (err error, success int) {
