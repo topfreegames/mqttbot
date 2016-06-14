@@ -38,6 +38,7 @@ var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 			for _, pluginMapping := range subscription.PluginMappings {
 				match, _ := regexp.Match(pluginMapping.MessagePattern, msg.Payload())
 				if match {
+					mqttBot.Plugins.ExecutePlugin(string(msg.Payload()[:]), pluginMapping.Plugin)
 					//trigger here
 				}
 			}

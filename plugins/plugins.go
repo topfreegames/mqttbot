@@ -1,6 +1,8 @@
 package plugins
 
 import (
+	"fmt"
+
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/plugins/modules"
 	"github.com/yuin/gopher-lua"
@@ -8,7 +10,6 @@ import (
 
 type Plugins struct {
 	PluginMappings []map[string]string
-	LState         *lua.LState
 }
 
 func GetPlugins() *Plugins {
@@ -19,22 +20,38 @@ func GetPlugins() *Plugins {
 }
 
 func (p *Plugins) SetupPlugins() {
-	p.loadModules()
+	p.preloadModules()
 }
 
-func (p *Plugins) loadModules() {
-	L := p.preloadModules()
+func (p *Plugins) preloadModules() {
+	L := lua.NewState()
+	defer L.Close()
+	p.loadModules(L)
 	if err := L.DoFile("plugins/load_modules.lua"); err != nil {
 		logger.Logger.Fatal("Error loading lua go modules, err:", err)
 	}
-	p.LState = L
 	logger.Logger.Info("Successfully loaded lua go modules")
 }
 
-func (p *Plugins) preloadModules() *lua.LState {
-	L := lua.NewState()
-	defer L.Close()
+func (p *Plugins) loadModules(L *lua.LState) {
 	L.PreloadModule("persistence_module", modules.PersistenceModuleLoader)
 	L.PreloadModule("mqttclient_module", modules.MqttClientModuleLoader)
-	return L
+}
+
+func (p *Plugins) ExecutePlugin(message, plugin string) (err error, success int) {
+	L := lua.NewState()
+	p.loadModules(L)
+	L.DoFile(fmt.Sprintf("./plugins/%s.lua", plugin))
+	defer L.Close()
+	if err := L.CallByParam(lua.P{
+		Fn:      L.GetGlobal("execute"),
+		NRet:    1,
+		Protect: true,
+	}, lua.LString(message)); err != nil {
+		logger.Logger.Error(err)
+		return err, 1
+	}
+	ret := L.Get(-1)
+	L.Pop(1)
+	return nil, int(ret.(lua.LNumber))
 }
