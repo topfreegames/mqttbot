@@ -3,6 +3,8 @@ package modules
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
+	"strings"
 	"time"
 
 	"github.com/satori/go.uuid"
@@ -63,5 +65,25 @@ func IndexMessage(L *lua.LState) int {
 }
 
 func QueryMessages(L *lua.LState) int {
+	topic := L.Get(-3)
+	limit := L.Get(-2)
+	start := L.Get(-1)
+	L.Pop(3)
+	logger.Logger.Debug(fmt.Sprintf("Getting %d messages from topic %s, starting with %d", int(lua.LVAsNumber(limit)), topic.String(), int(lua.LVAsNumber(start))))
+	topicSlice := strings.Split(topic.String(), "/")
+	topicId := topicSlice[len(topicSlice)-1]
+	termQuery := elastic.NewMatchQuery("topic", topicId)
+	searchResults, err := ESClient.Search().Index("chat").Query(termQuery).Sort("date", false).From(int(lua.LVAsNumber(start))).Size(int(lua.LVAsNumber(limit))).Do()
+	if err != nil {
+		L.Push(lua.LString(fmt.Sprintf("%s", err)))
+		L.Push(L.ToNumber(1))
+		return 2
+	}
+	var ttyp Message
+	for _, item := range searchResults.Each(reflect.TypeOf(ttyp)) {
+		if t, ok := item.(Message); ok {
+			logger.Logger.Debug(fmt.Sprintf("Message: %s\n", t))
+		}
+	}
 	return 0
 }
