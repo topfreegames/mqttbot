@@ -14,7 +14,7 @@ mqttserver:
       qos: 2
       plugins:
         - plugin: "send_history"
-          messagePattern: "history"
+          messagePattern: "^history$"
 elasticsearch:
   host: "localhost"
   port: 9200
