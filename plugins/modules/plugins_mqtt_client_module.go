@@ -35,7 +35,7 @@ func SendMessage(L *lua.LState) int {
 	logger.Logger.Debug(fmt.Sprintf("mqttclient_module send message topic: %s, payload: %s, qos: %d, retained: %s", topic, payload, qos, retained))
 	if token := mqttClient.Publish(topic.String(), byte(qos.(lua.LNumber)), bool(retained.(lua.LBool)), payload.String()); token.Wait() && token.Error() != nil {
 		logger.Logger.Error(token.Error())
-		L.Push(lua.LString(fmt.Sprint("%s", token.Error())))
+		L.Push(lua.LString(fmt.Sprintf("%s", token.Error())))
 		L.Push(L.ToNumber(1))
 		return 2
 	}
