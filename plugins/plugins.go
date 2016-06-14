@@ -58,7 +58,7 @@ func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (err error, succe
 	ret := L.Get(-1)
 	retErr := L.Get(-2)
 	L.Pop(2)
-	if retErr != nil {
+	if retErr != nil && retErr != lua.LNil {
 		logger.Logger.Error(retErr.String())
 		return errors.New(retErr.String()), 1
 	}
