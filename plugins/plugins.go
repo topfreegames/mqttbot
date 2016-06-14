@@ -41,16 +41,16 @@ func (p *Plugins) loadModules(L *lua.LState) {
 	L.PreloadModule("http", gluahttp.NewHttpModule(&http.Client{}).Loader)
 }
 
-func (p *Plugins) ExecutePlugin(message, plugin string) (err error, success int) {
+func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (err error, success int) {
 	L := lua.NewState()
 	p.loadModules(L)
 	L.DoFile(fmt.Sprintf("./plugins/%s.lua", plugin))
 	defer L.Close()
 	if err := L.CallByParam(lua.P{
-		Fn:      L.GetGlobal("execute"),
+		Fn:      L.GetGlobal("run_plugin"),
 		NRet:    1,
 		Protect: true,
-	}, lua.LString(message)); err != nil {
+	}, lua.LString(payload), lua.LString(topic)); err != nil {
 		logger.Logger.Error(err)
 		return err, 1
 	}
