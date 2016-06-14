@@ -1,6 +1,8 @@
 package modules
 
 import (
+	"fmt"
+
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/mqtt"
@@ -17,7 +19,7 @@ func MqttClientModuleLoader(L *lua.LState) int {
 }
 
 var mqttClientModuleExports = map[string]lua.LGFunction{
-	"sendMessage": SendMessage,
+	"send_message": SendMessage,
 }
 
 func configureMqttModule() {
@@ -25,6 +27,15 @@ func configureMqttModule() {
 }
 
 func SendMessage(L *lua.LState) int {
-	logger.Logger.Debug("mqttClientModule SendMessage called")
+	topic := L.Get(-4)
+	qos := L.Get(-3)
+	retained := L.Get(-2)
+	payload := L.Get(-1)
+	L.Pop(4)
+	logger.Logger.Debug(fmt.Sprintf("mqttclient_module send message topic: %s, payload: %s, qos: %d, retained: %s", topic, payload, qos, retained))
+	if token := mqttClient.Publish(topic.String(), byte(qos.(lua.LNumber)), bool(retained.(lua.LBool)), payload.String()); token.Wait() && token.Error() != nil {
+		logger.Logger.Error(token.Error())
+		return 1
+	}
 	return 0
 }
