@@ -2,7 +2,9 @@ package plugins
 
 import (
 	"fmt"
+	"net/http"
 
+	"github.com/cjoudrey/gluahttp"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/plugins/modules"
 	"github.com/yuin/gopher-lua"
@@ -36,6 +38,7 @@ func (p *Plugins) preloadModules() {
 func (p *Plugins) loadModules(L *lua.LState) {
 	L.PreloadModule("persistence_module", modules.PersistenceModuleLoader)
 	L.PreloadModule("mqttclient_module", modules.MqttClientModuleLoader)
+	L.PreloadModule("http", gluahttp.NewHttpModule(&http.Client{}).Loader)
 }
 
 func (p *Plugins) ExecutePlugin(message, plugin string) (err error, success int) {
