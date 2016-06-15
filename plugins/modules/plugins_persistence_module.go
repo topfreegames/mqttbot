@@ -4,11 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
-	"strings"
-	"time"
 
 	"github.com/layeh/gopher-luar"
-	"github.com/satori/go.uuid"
 	"github.com/topfreegames/mqttbot/es"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/yuin/gopher-lua"
@@ -19,13 +16,12 @@ type PayloadStruct struct {
 	From      string `json:"from"`
 	Message   string `json:"message"`
 	Timestamp int32  `json:"timestamp"`
+	Id        string `json:"id"`
 }
 
 type Message struct {
-	Id      string        `json:"id"`
 	Payload PayloadStruct `json:"payload"`
 	Topic   string        `json:"topic"`
-	Date    time.Time     `json:"date"`
 }
 
 var ESClient *elastic.Client
@@ -53,8 +49,6 @@ func IndexMessage(L *lua.LState) int {
 	var message Message
 	json.Unmarshal([]byte(payload.String()), &message)
 	message.Topic = topic.String()
-	message.Date = time.Now()
-	message.Id = uuid.NewV4().String()
 	if _, err := ESClient.Index().Index("chat").Type("message").BodyJson(message).Do(); err != nil {
 		L.Push(lua.LString(fmt.Sprintf("%s", err)))
 		L.Push(L.ToNumber(1))
@@ -72,10 +66,8 @@ func QueryMessages(L *lua.LState) int {
 	start := L.Get(-1)
 	L.Pop(3)
 	logger.Logger.Debug(fmt.Sprintf("Getting %d messages from topic %s, starting with %d", int(lua.LVAsNumber(limit)), topic.String(), int(lua.LVAsNumber(start))))
-	topicSlice := strings.Split(topic.String(), "/")
-	topicId := topicSlice[len(topicSlice)-1]
-	termQuery := elastic.NewMatchQuery("topic", topicId)
-	searchResults, err := ESClient.Search().Index("chat").Query(termQuery).Sort("date", false).From(int(lua.LVAsNumber(start))).Size(int(lua.LVAsNumber(limit))).Do()
+	termQuery := elastic.NewQueryStringQuery(fmt.Sprintf("topic:\"%s\"", topic.String()))
+	searchResults, err := ESClient.Search().Index("chat").Query(termQuery).Sort("payload.timestamp", false).From(int(lua.LVAsNumber(start))).Size(int(lua.LVAsNumber(limit))).Do()
 	if err != nil {
 		L.Push(lua.LString(fmt.Sprintf("%s", err)))
 		L.Push(L.ToNumber(1))
