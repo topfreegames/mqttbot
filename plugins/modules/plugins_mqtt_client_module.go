@@ -23,7 +23,7 @@ var mqttClientModuleExports = map[string]lua.LGFunction{
 }
 
 func configureMqttModule() {
-	mqttClient = mqttclient.GetMqttClient().MqttClient
+	mqttClient = mqttclient.GetMqttClient(nil).MqttClient
 }
 
 func SendMessage(L *lua.LState) int {

@@ -48,7 +48,7 @@ var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 func GetMqttBot() *MqttBot {
 	once.Do(func() {
 		mqttBot = &MqttBot{}
-		mqttBot.Client = mqttclient.GetMqttClient()
+		mqttBot.Client = mqttclient.GetMqttClient(onClientConnectHandler)
 		mqttBot.setupPlugins()
 	})
 	return mqttBot
@@ -57,6 +57,10 @@ func GetMqttBot() *MqttBot {
 func (b *MqttBot) setupPlugins() {
 	b.Plugins = plugins.GetPlugins()
 	b.Plugins.SetupPlugins()
+}
+
+var onClientConnectHandler = func(client mqtt.Client) {
+	mqttBot.StartBot()
 }
 
 func (b *MqttBot) StartBot() {
