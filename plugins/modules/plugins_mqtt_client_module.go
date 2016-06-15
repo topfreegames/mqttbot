@@ -39,7 +39,7 @@ func SendMessage(L *lua.LState) int {
 		L.Push(L.ToNumber(1))
 		return 2
 	}
-	L.Push(nil)
+	L.Push(lua.LNil)
 	L.Push(L.ToNumber(0))
 	return 2
 }
