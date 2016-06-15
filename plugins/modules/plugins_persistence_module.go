@@ -16,8 +16,9 @@ import (
 )
 
 type PayloadStruct struct {
-	From    string `json:"from"`
-	Message string `json:"message"`
+	From      string `json:"from"`
+	Message   string `json:"message"`
+	Timestamp int32  `json:"timestamp"`
 }
 
 type Message struct {
@@ -88,7 +89,7 @@ func QueryMessages(L *lua.LState) int {
 			payloads = append(payloads, t.Payload)
 		}
 	}
-	L.Push(nil)
+	L.Push(lua.LNil)
 	L.Push(luar.New(L, payloads))
 	return 2
 }
