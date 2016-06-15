@@ -5,7 +5,7 @@ mqttserver:
   host: "localhost"
   port: 1883
   subscriptionRequests:
-    - topic: 'chat/#'
+    - topic: 'chat/+/room/+'
       qos: 2
       plugins:
         - plugin: "persist_message"
@@ -14,7 +14,7 @@ mqttserver:
       qos: 2
       plugins:
         - plugin: "send_history"
-          messagePattern: "\"message\": \"history\""
+          messagePattern: "\"history\""
 elasticsearch:
   host: "localhost"
   port: 9200
