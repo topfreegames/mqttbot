@@ -20,18 +20,18 @@ type MqttClient struct {
 var Client *MqttClient
 var once sync.Once
 
-func GetMqttClient() *MqttClient {
+func GetMqttClient(onConnectHandler mqtt.OnConnectHandler) *MqttClient {
 	once.Do(func() {
 		Client = &MqttClient{}
-		Client.configure()
+		Client.configure(onConnectHandler)
 	})
 	return Client
 }
 
-func (c *MqttClient) configure() {
+func (c *MqttClient) configure(onConnectHandler mqtt.OnConnectHandler) {
 	c.setConfigurationDefaults()
 	c.configureClient()
-	c.start()
+	c.start(onConnectHandler)
 }
 
 func (c *MqttClient) setConfigurationDefaults() {
@@ -45,12 +45,14 @@ func (c *MqttClient) configureClient() {
 	c.MqttServerPort = viper.GetInt("mqttserver.port")
 }
 
-func (mc *MqttClient) start() {
+func (mc *MqttClient) start(onConnectHandler mqtt.OnConnectHandler) {
 	logger.Logger.Debug("Initializing mqtt client")
 
 	opts := mqtt.NewClientOptions().AddBroker(fmt.Sprintf("tcp://%s:%d", mc.MqttServerHost, mc.MqttServerPort)).SetClientID("mqttbot")
-	opts.SetKeepAlive(2 * time.Second)
-	opts.SetPingTimeout(1 * time.Second)
+	opts.SetKeepAlive(3 * time.Second)
+	opts.SetPingTimeout(5 * time.Second)
+	opts.SetMaxReconnectInterval(30 * time.Second)
+	opts.SetOnConnectHandler(onConnectHandler)
 	mc.MqttClient = mqtt.NewClient(opts)
 
 	c := mc.MqttClient

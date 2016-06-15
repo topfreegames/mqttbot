@@ -52,7 +52,6 @@ func (app *App) loadConfiguration() {
 
 func (app *App) configureApplication() {
 	app.MqttBot = bot.GetMqttBot()
-	app.MqttBot.StartBot()
 	app.Api = iris.New()
 	a := app.Api
 
