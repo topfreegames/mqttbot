@@ -13,7 +13,6 @@ import (
 type MqttClient struct {
 	MqttServerHost string
 	MqttServerPort int
-	ConfigPath     string
 	MqttClient     mqtt.Client
 }
 
@@ -37,6 +36,8 @@ func (c *MqttClient) configure(onConnectHandler mqtt.OnConnectHandler) {
 func (c *MqttClient) setConfigurationDefaults() {
 	viper.SetDefault("mqttserver.host", "localhost")
 	viper.SetDefault("mqttserver.port", 1883)
+	viper.SetDefault("mqttserver.user", "admin")
+	viper.SetDefault("mqttserver.pass", "admin")
 	viper.SetDefault("mqttserver.subscriptions", []map[string]string{})
 }
 
@@ -49,6 +50,8 @@ func (mc *MqttClient) start(onConnectHandler mqtt.OnConnectHandler) {
 	logger.Logger.Debug("Initializing mqtt client")
 
 	opts := mqtt.NewClientOptions().AddBroker(fmt.Sprintf("tcp://%s:%d", mc.MqttServerHost, mc.MqttServerPort)).SetClientID("mqttbot")
+	opts.SetUsername(viper.GetString("mqttserver.user"))
+	opts.SetPassword(viper.GetString("mqttserver.pass"))
 	opts.SetKeepAlive(3 * time.Second)
 	opts.SetPingTimeout(5 * time.Second)
 	opts.SetMaxReconnectInterval(30 * time.Second)

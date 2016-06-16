@@ -55,7 +55,7 @@ func IndexMessage(L *lua.LState) int {
 		return 2
 	}
 	logger.Logger.Debug(fmt.Sprintf("Message persisted: %s", message))
-	L.Push(nil)
+	L.Push(lua.LNil)
 	L.Push(L.ToNumber(0))
 	return 2
 }

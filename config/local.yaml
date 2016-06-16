@@ -4,6 +4,8 @@ healthcheck:
 mqttserver:
   host: "localhost"
   port: 1883
+  user: "admin"
+  pass: "admin"
   subscriptionRequests:
     - topic: 'chat/+/room/+'
       qos: 2
@@ -15,9 +17,19 @@ mqttserver:
       plugins:
         - plugin: "send_history"
           messagePattern: "\"history\""
+    - topic: 'mqttbot/register/#'
+      qos: 2
+      plugins:
+        - plugin: "register_user"
+          messagePattern: ".*"
 elasticsearch:
   host: "localhost"
   port: 9200
   sniff: false
   indexMappings:
     chat: '{ "mappings": { "message":{"_ttl": { "enabled": true, "default": "2d" }}}}'
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+  maxPoolSize: 10
