@@ -1,5 +1,5 @@
-hash: 8263b886b68ef352370e6573b30c21b755402a23631cbf641bbd60ecbe826801
-updated: 2016-06-16T17:02:09.850310971-03:00
+hash: 5e470eb3bdf6a7d84b980187ff009f7be347f04a4db8e1b1cddd547734c46724
+updated: 2016-06-16T20:34:09.764697847-03:00
 imports:
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
@@ -118,6 +118,10 @@ imports:
   - ast
   - parse
   - pm
+- name: golang.org/x/crypto
+  version: f3241ce8505855877cc8a9717bd61a0f7c4ea83c
+  subpackages:
+  - pbkdf2
 - name: golang.org/x/net
   version: d7bf3545bb0dacf009c535b3d3fbf53ac0a339ab
   subpackages:
