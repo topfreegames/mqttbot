@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/kataras/iris"
 	"github.com/spf13/viper"
@@ -41,8 +40,6 @@ func (app *App) setConfigurationDefaults() {
 }
 
 func (app *App) loadConfiguration() {
-	viper.SetEnvPrefix("mqttbot")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -38,6 +39,7 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	}
 	viper.SetEnvPrefix("mqttbot")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.SetConfigName(".mqttbot") // name of config file (without extension)
 	viper.AddConfigPath("$HOME")    // adding home directory as first search path
 	viper.AutomaticEnv()            // read in environment variables that match
