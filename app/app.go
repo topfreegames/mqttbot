@@ -14,7 +14,7 @@ type App struct {
 	Debug   bool
 	Port    int
 	Host    string
-	Api     *iris.Iris
+	Api     *iris.Framework
 	MqttBot *bot.MqttBot
 }
 
