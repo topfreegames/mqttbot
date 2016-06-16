@@ -12,10 +12,12 @@ import (
 	"github.com/yuin/gopher-lua"
 )
 
+// Plugins is the default type a plugin implements
 type Plugins struct {
 	PluginMappings []map[string]string
 }
 
+// GetPlugins returns the list of plugins
 func GetPlugins() *Plugins {
 	plugins := &Plugins{
 		PluginMappings: []map[string]string{},
@@ -23,6 +25,7 @@ func GetPlugins() *Plugins {
 	return plugins
 }
 
+// SetupPlugins prepares the plugins
 func (p *Plugins) SetupPlugins() {
 	p.preloadModules()
 }
@@ -43,9 +46,11 @@ func (p *Plugins) loadModules(L *lua.LState) {
 	L.PreloadModule("redis_module", modules.RedisModuleLoader)
 	L.PreloadModule("http", gluahttp.NewHttpModule(&http.Client{}).Loader)
 	L.PreloadModule("json", json.Loader)
+	L.PreloadModule("password", modules.PasswordModuleLoader)
 }
 
-func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (err error, success int) {
+// ExecutePlugin calls the proper plugin with the parameters
+func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (success int, err error) {
 	L := lua.NewState()
 	p.loadModules(L)
 	L.DoFile(fmt.Sprintf("./plugins/%s.lua", plugin))
@@ -56,14 +61,14 @@ func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (err error, succe
 		Protect: true,
 	}, lua.LString(topic), lua.LString(payload)); err != nil {
 		logger.Logger.Error(err)
-		return err, 1
+		return 1, err
 	}
 	ret := L.Get(-1)
 	retErr := L.Get(-2)
 	L.Pop(2)
 	if retErr != nil && retErr != lua.LNil {
 		logger.Logger.Error(retErr.String())
-		return errors.New(retErr.String()), 1
+		return 1, errors.New(retErr.String())
 	}
-	return nil, int(ret.(lua.LNumber))
+	return int(ret.(lua.LNumber)), nil
 }
