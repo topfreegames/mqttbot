@@ -15,6 +15,7 @@ import (
 var redisPool *redis.Pool
 var once sync.Once
 
+// RedisModuleLoader loads the Redis module
 func RedisModuleLoader(L *lua.LState) int {
 	loadDefaultConfigurations()
 	InitRedisPool()
@@ -27,6 +28,7 @@ var redisClientModuleExports = map[string]lua.LGFunction{
 	"execute": ExecuteCommand,
 }
 
+// InitRedisPool starts the redis pool
 func InitRedisPool() {
 	once.Do(func() {
 		loadDefaultConfigurations()
@@ -49,6 +51,7 @@ func loadDefaultConfigurations() {
 	viper.SetDefault("redis.maxPoolSize", 10)
 }
 
+// ExecuteCommand executes the command given by the Lua script
 func ExecuteCommand(L *lua.LState) int {
 	command := L.Get(1)
 	argNum := L.Get(2)
