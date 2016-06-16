@@ -1,0 +1,15 @@
+package: github.com/topfreegames/mqttbot
+import:
+- package: github.com/cjoudrey/gluahttp
+- package: github.com/eclipse/paho.mqtt.golang
+- package: github.com/garyburd/redigo
+  subpackages:
+  - redis
+- package: github.com/kataras/iris
+- package: github.com/layeh/gopher-json
+- package: github.com/layeh/gopher-luar
+- package: github.com/op/go-logging
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper
+- package: github.com/yuin/gopher-lua
+- package: gopkg.in/olivere/elastic.v3
