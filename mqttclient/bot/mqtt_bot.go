@@ -8,7 +8,7 @@ import (
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
-	"github.com/topfreegames/mqttbot/mqtt"
+	"github.com/topfreegames/mqttbot/mqttclient"
 	"github.com/topfreegames/mqttbot/plugins"
 )
 

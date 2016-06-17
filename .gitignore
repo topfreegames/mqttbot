@@ -3,6 +3,9 @@
 *.a
 *.so
 mqttbot
+coverage.out
+coverage-all.out
+profile.cov
 
 # Folders
 _obj
