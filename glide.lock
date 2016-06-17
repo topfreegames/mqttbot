@@ -1,6 +1,23 @@
-hash: 5e470eb3bdf6a7d84b980187ff009f7be347f04a4db8e1b1cddd547734c46724
-updated: 2016-06-16T20:34:09.764697847-03:00
+hash: c44684f22d12202ce19e092857f76bea75d2714c8c342417b8c72911a8b94fb2
+updated: 2016-06-17T01:39:54.412932269-03:00
 imports:
+- name: github.com/aws/aws-sdk-go
+  version: d3b6d25135b4e09ecd39ea3c2a5cad35279b0515
+  subpackages:
+  - aws
+  - aws/defaults
+  - aws/request
+  - private/signer/v4
+  - aws/awserr
+  - aws/credentials
+  - aws/corehandlers
+  - aws/credentials/ec2rolecreds
+  - aws/ec2metadata
+  - private/endpoints
+  - aws/awsutil
+  - aws/client/metadata
+  - private/protocol/rest
+  - aws/client
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
 - name: github.com/cjoudrey/gluahttp
@@ -24,8 +41,10 @@ imports:
   subpackages:
   - redis
   - internal
+- name: github.com/go-ini/ini
+  version: 72ba3e6b9e6b87e0c74c9a7a4dc86e8dd8ba4355
 - name: github.com/hashicorp/hcl
-  version: d7400db7143f8e869812e50a53acd6c8d92af3b8
+  version: aa7699b7b62c5f410f4cf7b58f3f9b17a71fb4ad
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -43,10 +62,12 @@ imports:
   version: 672da7dc0b798b54603604e52d031bb0faf3ea2a
 - name: github.com/iris-contrib/websocket
   version: 441a7ebf17ed34d57d7fedb2ceddc9f7e2ffd5cd
+- name: github.com/jmespath/go-jmespath
+  version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
 - name: github.com/Joker/jade
   version: db4d7e4f68708c5020c392b380e3565df2132840
 - name: github.com/kataras/iris
-  version: 0d482508fce00ab77cfb8f9f7584e13fc035aef4
+  version: f21faa7cfdfc597d77787c18a691399312ada88e
   subpackages:
   - config
   - context
@@ -132,8 +153,8 @@ imports:
   version: 62bee037599929a6e9146f29d10dd5208c43507d
   subpackages:
   - unix
-- name: gopkg.in/olivere/elastic.v3
-  version: 7a92d18eaf7a9f95d603e70970fb5adcd4dc62f1
+- name: gopkg.in/topfreegames/elastic.v2
+  version: 0996752452c036d9707a8b45308aa28449a21bfa
   subpackages:
   - backoff
   - uritemplates

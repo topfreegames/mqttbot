@@ -42,7 +42,7 @@ func genHash(pass string) string {
 	salt := make([]byte, 12)
 	_, err := io.ReadFull(rand.Reader, salt)
 	if err != nil {
-		logger.Logger.Warning("Error generating salt")
+		logger.Logger.Error(err)
 		return ""
 	}
 	esalt := base64.StdEncoding.EncodeToString(salt)

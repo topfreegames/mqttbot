@@ -9,7 +9,7 @@ import (
 	"github.com/topfreegames/mqttbot/es"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/yuin/gopher-lua"
-	"gopkg.in/olivere/elastic.v3"
+	"gopkg.in/topfreegames/elastic.v2"
 )
 
 type PayloadStruct struct {
