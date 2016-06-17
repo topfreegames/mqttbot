@@ -1,23 +1,23 @@
 hash: c44684f22d12202ce19e092857f76bea75d2714c8c342417b8c72911a8b94fb2
-updated: 2016-06-17T01:39:54.412932269-03:00
+updated: 2016-06-17T11:26:29.187399029-03:00
 imports:
 - name: github.com/aws/aws-sdk-go
   version: d3b6d25135b4e09ecd39ea3c2a5cad35279b0515
   subpackages:
-  - aws
   - aws/defaults
-  - aws/request
-  - private/signer/v4
-  - aws/awserr
-  - aws/credentials
+  - aws
   - aws/corehandlers
+  - aws/credentials
   - aws/credentials/ec2rolecreds
   - aws/ec2metadata
+  - aws/request
   - private/endpoints
-  - aws/awsutil
-  - aws/client/metadata
-  - private/protocol/rest
+  - private/signer/v4
+  - aws/awserr
   - aws/client
+  - aws/client/metadata
+  - aws/awsutil
+  - private/protocol/rest
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
 - name: github.com/cjoudrey/gluahttp
@@ -129,7 +129,7 @@ imports:
 - name: github.com/spf13/viper
   version: c1ccc378a054ea8d4e38d8c67f6938d4760b53dd
 - name: github.com/valyala/fasthttp
-  version: 83a24c301bb683e450cd0304a3eb69556c48678c
+  version: d42167fd04f636e20b005e9934159e95454233c7
   subpackages:
   - fasthttpadaptor
   - fasthttputil
@@ -154,7 +154,7 @@ imports:
   subpackages:
   - unix
 - name: gopkg.in/topfreegames/elastic.v2
-  version: 0996752452c036d9707a8b45308aa28449a21bfa
+  version: c818f8aa1974340ee8bbfdda4adaf7e832c46353
   subpackages:
   - backoff
   - uritemplates
