@@ -4,7 +4,7 @@ local json = require 'json'
 
 function run_plugin(topic, payload)
   local json_message = json.decode(payload)
-  --message: {"payload": {"from": "someone", "message": "history", "limit": 100, "start":0}}
+  --message: {"payload": {"from": "someone", "topic": "xxx", "message": "history", "limit": 100, "start":0}}
   local history_topic = json_message["payload"]["topic"]
   local user_requesting = json_message["payload"]["from"]
   err, payloads = pm.query_messages(history_topic, json_message["payload"]["limit"], json_message["payload"]["start"])
