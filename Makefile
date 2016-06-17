@@ -16,8 +16,10 @@ build:
 	@go build
 
 coverage:
-	@./testandcover.sh
-
+	@echo "mode: count" > coverage-all.out
+	@$(foreach pkg,$(PACKAGES),\
+		go test -coverprofile=coverage.out -covermode=count $(pkg);\
+		tail -n +2 coverage.out >> coverage-all.out;)
 run:
 	@go run main.go start
 
