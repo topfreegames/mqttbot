@@ -21,4 +21,4 @@ script:
   - $HOME/gopath/bin/goveralls -coverprofile coverage-all.out -service=travis-ci
 
 after_success:
-    - ./push_to_docker.sh
+  - ./push_to_docker.sh
