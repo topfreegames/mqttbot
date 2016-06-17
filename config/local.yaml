@@ -23,7 +23,7 @@ mqttserver:
         - plugin: "register_user"
           messagePattern: ".*"
 elasticsearch:
-  host: "localhost"
+  host: "http://localhost:9200"
   sniff: false
   indexMappings:
     chat: '{ "mappings": { "message":{"_ttl": { "enabled": true, "default": "2d" }}}}'
