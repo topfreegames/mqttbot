@@ -9,6 +9,7 @@ import (
 	"github.com/topfreegames/mqttbot/logger"
 )
 
+// App is the struct that defines the application
 type App struct {
 	Debug   bool
 	Port    int
@@ -17,6 +18,7 @@ type App struct {
 	MqttBot *bot.MqttBot
 }
 
+// GetApp creates an app given the parameters
 func GetApp(host string, port int, debug bool) *App {
 	logger.SetupLogger(viper.GetString("logger.level"))
 	logger.Logger.Debug(fmt.Sprintf("Starting app with host: %s, port: %d, configFile: %s", host, port, viper.ConfigFileUsed()))
@@ -29,6 +31,7 @@ func GetApp(host string, port int, debug bool) *App {
 	return app
 }
 
+// Configure configures the application
 func (app *App) Configure() {
 	app.setConfigurationDefaults()
 	app.loadConfiguration()
@@ -51,6 +54,7 @@ func (app *App) configureApplication() {
 	a.Get("/healthcheck", HealthCheckHandler(app))
 }
 
+// Start starts the application
 func (app *App) Start() {
 	app.Api.Listen(fmt.Sprintf("%s:%d", app.Host, app.Port))
 }
