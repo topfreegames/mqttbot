@@ -43,9 +43,13 @@ func initConfig() {
 	viper.SetConfigName(".mqttbot") // name of config file (without extension)
 	viper.AddConfigPath("$HOME")    // adding home directory as first search path
 	viper.AutomaticEnv()            // read in environment variables that match
+	viper.SetDefault("logger.level", "DEBUG")
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
+	err := viper.ReadInConfig()
+	if err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Printf("Error loading config: ", err)
 	}
 }

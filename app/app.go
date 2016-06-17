@@ -18,7 +18,7 @@ type App struct {
 }
 
 func GetApp(host string, port int, debug bool) *App {
-	logger.SetupLogger()
+	logger.SetupLogger(viper.GetString("logger.level"))
 	logger.Logger.Debug(fmt.Sprintf("Starting app with host: %s, port: %d, configFile: %s", host, port, viper.ConfigFileUsed()))
 	app := &App{
 		Host:  host,
@@ -41,10 +41,6 @@ func (app *App) setConfigurationDefaults() {
 
 func (app *App) loadConfiguration() {
 	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err == nil {
-		logger.Logger.Debug(fmt.Sprintf("Using config file: %s", viper.ConfigFileUsed()))
-	}
 }
 
 func (app *App) configureApplication() {
