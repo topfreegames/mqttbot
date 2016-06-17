@@ -8,7 +8,7 @@ import (
 	"github.com/cjoudrey/gluahttp"
 	"github.com/layeh/gopher-json"
 	"github.com/topfreegames/mqttbot/logger"
-	"github.com/topfreegames/mqttbot/plugins/modules"
+	"github.com/topfreegames/mqttbot/modules"
 	"github.com/yuin/gopher-lua"
 )
 
