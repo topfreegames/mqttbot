@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"sync"
@@ -12,17 +13,20 @@ import (
 	"github.com/topfreegames/mqttbot/plugins"
 )
 
+// PluginMapping defines the plugin to listen to given patterns
 type PluginMapping struct {
 	Plugin         string
 	MessagePattern string
 }
 
+// Subscription defines the plugin mappings to a given topic
 type Subscription struct {
 	Topic          string
 	Qos            int
 	PluginMappings []*PluginMapping
 }
 
+// MqttBot defines the bot, it contains plugins, subscriptions and a client
 type MqttBot struct {
 	Plugins       *plugins.Plugins
 	Subscriptions []*Subscription
@@ -45,6 +49,7 @@ var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	}
 }
 
+// GetMqttBot returns a initialized mqtt bot
 func GetMqttBot() *MqttBot {
 	once.Do(func() {
 		mqttBot = &MqttBot{}
@@ -63,6 +68,8 @@ var onClientConnectHandler = func(client mqtt.Client) {
 	mqttBot.StartBot()
 }
 
+// StartBot starts the bot, it subscribes the bot to the topics defined in the
+// configuration file
 func (b *MqttBot) StartBot() {
 	subscriptions := viper.Get("mqttserver.subscriptionRequests").([]interface{})
 	client := b.Client.MqttClient
@@ -87,7 +94,7 @@ func (b *MqttBot) StartBot() {
 		if token := client.Subscribe(topic, uint8(qos), h); token.Wait() && token.Error() != nil {
 			logger.Logger.Fatal(token.Error())
 		}
+		logger.Logger.Debug(fmt.Sprintf("Subscribed to %s", topic))
 		b.Subscriptions = append(b.Subscriptions, subscriptionNow)
 	}
-	logger.Logger.Debug("Successfully subscribed to mqtt topics matching patterns /chat/# and /bot/history/#")
 }
