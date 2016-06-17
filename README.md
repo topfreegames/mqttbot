@@ -1,5 +1,6 @@
-MqttBot
-=======
+# MqttBot
+
+[![Build Status](https://travis-ci.org/topfreegames/mqttbot.svg?branch=master)](https://travis-ci.org/topfreegames/mqttbot)
 
 A utility bot for MQTT-based chat services. MqttBot is implemented in Go with
 support to Lua plugins.
