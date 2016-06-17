@@ -15,6 +15,9 @@ build:
 	@go build $(PACKAGES)
 	@go build
 
+coverage:
+	@./testandcover.sh
+
 run:
 	@go run main.go start
 

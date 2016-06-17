@@ -5,7 +5,7 @@ import (
 
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/topfreegames/mqttbot/logger"
-	"github.com/topfreegames/mqttbot/mqtt"
+	"github.com/topfreegames/mqttbot/mqttclient"
 	"github.com/yuin/gopher-lua"
 )
 

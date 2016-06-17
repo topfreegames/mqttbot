@@ -15,4 +15,6 @@ before_script:
 install:
   - make setup-ci
 
-script: go test $(glide novendor)
+script:
+  - make coverage
+  - $HOME/gopath/bin/goveralls -coverprofile coverage-all.out -service=travis-ci

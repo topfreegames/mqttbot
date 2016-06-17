@@ -1,0 +1,9 @@
+github.com/topfreegames/mqttbot/app
+github.com/topfreegames/mqttbot/cmd
+github.com/topfreegames/mqttbot/es
+github.com/topfreegames/mqttbot/logger
+github.com/topfreegames/mqttbot/models
+github.com/topfreegames/mqttbot/mqttclient
+github.com/topfreegames/mqttbot/mqttclient/bot
+github.com/topfreegames/mqttbot/plugins
+github.com/topfreegames/mqttbot/plugins/modules
