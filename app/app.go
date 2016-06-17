@@ -5,8 +5,8 @@ import (
 
 	"github.com/kataras/iris"
 	"github.com/spf13/viper"
+	"github.com/topfreegames/mqttbot/bot"
 	"github.com/topfreegames/mqttbot/logger"
-	"github.com/topfreegames/mqttbot/mqttclient/bot"
 )
 
 type App struct {
