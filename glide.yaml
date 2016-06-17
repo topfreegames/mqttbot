@@ -12,7 +12,7 @@ import:
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
 - package: github.com/yuin/gopher-lua
-- package: gopkg.in/olivere/elastic.v3
 - package: golang.org/x/crypto
   subpackages:
   - pbkdf2
+- package: gopkg.in/topfreegames/elastic.v2
