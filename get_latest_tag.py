@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 # https://github.com/topfreegames/mqttbot
 # Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license
