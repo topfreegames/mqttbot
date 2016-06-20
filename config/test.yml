@@ -28,7 +28,7 @@ mqttserver:
         - plugin: "add_user_subscription_acl"
           messagePattern: "aclpermitsubscription"
 elasticsearch:
-  host: "http://localhost:9200"
+  host: "localhost:9200"
   sniff: false
   indexMappings:
     chat: '{ "mappings": { "message":{"_ttl": { "enabled": true, "default": "2d" }}}}'

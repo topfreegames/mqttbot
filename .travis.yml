@@ -7,7 +7,6 @@ sudo: required
 
 services:
   - redis-server
-  - elasticsearch
   - docker
 
 before_script:
