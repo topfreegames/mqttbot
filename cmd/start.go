@@ -18,6 +18,7 @@ var startCmd = &cobra.Command{
 		app := app.GetApp(
 			host,
 			port,
+			CfgFile,
 			debug,
 		)
 		app.Start()
@@ -27,7 +28,7 @@ var startCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(startCmd)
 
-	startCmd.Flags().StringVarP(&host, "bind", "b", "0.0.0.0", "Host to bind khan to")
-	startCmd.Flags().IntVarP(&port, "port", "p", 8888, "Port to bind khan to")
+	startCmd.Flags().StringVarP(&host, "bind", "b", "0.0.0.0", "Host to bind mqttbot to")
+	startCmd.Flags().IntVarP(&port, "port", "p", 8888, "Port to bind mqttbot to")
 	startCmd.Flags().BoolVarP(&debug, "debug", "d", false, "Debug mode")
 }

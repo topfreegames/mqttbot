@@ -9,9 +9,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+// CfgFile is the path to the configuration file
+var CfgFile string
 
-//RootCmd is the root command for khan CLI application
+//RootCmd is the root command for mqttbot CLI application
 var RootCmd = &cobra.Command{
 	Use:   "mqttbot",
 	Short: "mqttbot is a bot spies on your mqtt topics",
@@ -28,15 +29,15 @@ func Execute(cmd *cobra.Command) {
 
 func init() {
 	RootCmd.PersistentFlags().StringVarP(
-		&cfgFile, "config", "c", "./config/local.yaml",
+		&CfgFile, "config", "c", "./config/local.yaml",
 		"config file (default is ./config/local.yaml)",
 	)
 	initConfig()
 }
 
 func initConfig() {
-	if cfgFile != "" { // enable ability to specify config file via flag
-		viper.SetConfigFile(cfgFile)
+	if CfgFile != "" { // enable ability to specify config file via flag
+		viper.SetConfigFile(CfgFile)
 	}
 	viper.SetEnvPrefix("mqttbot")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -48,8 +49,8 @@ func initConfig() {
 	// If a config file is found, read it in.
 	err := viper.ReadInConfig()
 	if err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		fmt.Println("Using config file: ", viper.ConfigFileUsed())
 	} else {
-		fmt.Printf("Error loading config: ", err)
+		fmt.Printf("Error loading config: %v", err)
 	}
 }

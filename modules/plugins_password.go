@@ -27,16 +27,16 @@ func PasswordModuleLoader(L *lua.LState) int {
 func GenerateHash(L *lua.LState) int {
 	password := L.Get(1)
 	L.Pop(1)
-	hash := genHash(password.String())
+	hash := GenHash(password.String())
 	L.Push(lua.LNil)
 	L.Push(lua.LString(hash))
 	return 2
 }
 
-// This function generates the hash according to the expected by mosquitto auth
+// GenHash generates the hash according to the expected by mosquitto auth
 // plugin, it is not the normal implementation
 // Reference: https://github.com/jpmens/mosquitto-auth-plug/issues/44
-func genHash(pass string) string {
+func GenHash(pass string) string {
 	bpass := []byte(pass)
 	iterations := 901
 	salt := make([]byte, 12)
