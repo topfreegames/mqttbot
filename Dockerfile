@@ -11,7 +11,7 @@ RUN go get -u github.com/Masterminds/glide/...
 
 ADD . /go/src/github.com/topfreegames/mqttbot
 
-WORKDIR /go/src/github.com/topfreegames/mqttbot 
+WORKDIR /go/src/github.com/topfreegames/mqttbot
 RUN glide install
 RUN go install github.com/topfreegames/mqttbot
 

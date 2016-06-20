@@ -31,6 +31,7 @@ type MqttBot struct {
 	Plugins       *plugins.Plugins
 	Subscriptions []*Subscription
 	Client        *mqttclient.MqttClient
+	Config        *viper.Viper
 }
 
 var mqttBot *MqttBot
@@ -50,17 +51,17 @@ var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 // GetMqttBot returns a initialized mqtt bot
-func GetMqttBot() *MqttBot {
+func GetMqttBot(config *viper.Viper) *MqttBot {
 	once.Do(func() {
-		mqttBot = &MqttBot{}
-		mqttBot.Client = mqttclient.GetMqttClient(onClientConnectHandler)
+		mqttBot = &MqttBot{Config: config}
+		mqttBot.Client = mqttclient.GetMqttClient(config, onClientConnectHandler)
 		mqttBot.setupPlugins()
 	})
 	return mqttBot
 }
 
 func (b *MqttBot) setupPlugins() {
-	b.Plugins = plugins.GetPlugins()
+	b.Plugins = plugins.GetPlugins(b.Config)
 	b.Plugins.SetupPlugins()
 }
 
@@ -71,7 +72,7 @@ var onClientConnectHandler = func(client mqtt.Client) {
 // StartBot starts the bot, it subscribes the bot to the topics defined in the
 // configuration file
 func (b *MqttBot) StartBot() {
-	subscriptions := viper.Get("mqttserver.subscriptionRequests").([]interface{})
+	subscriptions := b.Config.Get("mqttserver.subscriptionRequests").([]interface{})
 	client := b.Client.MqttClient
 	b.Subscriptions = []*Subscription{}
 	for _, s := range subscriptions {

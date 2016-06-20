@@ -7,6 +7,7 @@ import (
 
 	"github.com/cjoudrey/gluahttp"
 	"github.com/layeh/gopher-json"
+	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/modules"
 	"github.com/yuin/gopher-lua"
@@ -15,12 +16,14 @@ import (
 // Plugins is the default type a plugin implements
 type Plugins struct {
 	PluginMappings []map[string]string
+	Config         *viper.Viper
 }
 
 // GetPlugins returns the list of plugins
-func GetPlugins() *Plugins {
+func GetPlugins(config *viper.Viper) *Plugins {
 	plugins := &Plugins{
 		PluginMappings: []map[string]string{},
+		Config:         config,
 	}
 	return plugins
 }
@@ -31,16 +34,18 @@ func (p *Plugins) SetupPlugins() {
 }
 
 func (p *Plugins) preloadModules() {
+	loadModulesPath := p.Config.GetString("plugins.modulesPath")
 	L := lua.NewState()
 	defer L.Close()
 	p.loadModules(L)
-	if err := L.DoFile("plugins/load_modules.lua"); err != nil {
+	if err := L.DoFile(loadModulesPath); err != nil {
 		logger.Logger.Fatal("Error loading lua go modules, err:", err)
 	}
 	logger.Logger.Info("Successfully loaded lua go modules")
 }
 
 func (p *Plugins) loadModules(L *lua.LState) {
+	modules.Config = p.Config
 	L.PreloadModule("persistence_module", modules.PersistenceModuleLoader)
 	L.PreloadModule("mqttclient_module", modules.MqttClientModuleLoader)
 	L.PreloadModule("redis_module", modules.RedisModuleLoader)

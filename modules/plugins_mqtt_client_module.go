@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/eclipse/paho.mqtt.golang"
+	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/mqttclient"
 	"github.com/yuin/gopher-lua"
@@ -11,6 +12,10 @@ import (
 
 var mqttClient mqtt.Client
 
+// Config is the configuration for the plugins
+var Config *viper.Viper
+
+// MqttClientModuleLoader loads the module and prepares it
 func MqttClientModuleLoader(L *lua.LState) int {
 	configureMqttModule()
 	mod := L.SetFuncs(L.NewTable(), mqttClientModuleExports)
@@ -23,16 +28,19 @@ var mqttClientModuleExports = map[string]lua.LGFunction{
 }
 
 func configureMqttModule() {
-	mqttClient = mqttclient.GetMqttClient(nil).MqttClient
+	mqttClient = mqttclient.GetMqttClient(Config, nil).MqttClient
 }
 
+// SendMessage sends message to mqtt
 func SendMessage(L *lua.LState) int {
 	topic := L.Get(-4)
 	qos := L.Get(-3)
 	retained := L.Get(-2)
 	payload := L.Get(-1)
 	L.Pop(4)
-	logger.Logger.Debug(fmt.Sprintf("mqttclient_module send message topic: %s, payload: %s, qos: %d, retained: %s", topic, payload, qos, retained))
+	logger.Logger.Debug(fmt.Sprintf(
+		"mqttclient_module send message topic: %s, payload: %s, qos: %s, retained: %s",
+		topic, payload, qos, retained))
 	if token := mqttClient.Publish(topic.String(), byte(qos.(lua.LNumber)), bool(retained.(lua.LBool)), payload.String()); token.Wait() && token.Error() != nil {
 		logger.Logger.Error(token.Error())
 		L.Push(lua.LString(fmt.Sprintf("%s", token.Error())))
