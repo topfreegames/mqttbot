@@ -6,17 +6,13 @@ go:
 sudo: required
 
 services:
-  - redis-server
   - docker
-
-before_script:
-  - sleep 10
-
-before_install:
-  - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.7.5.deb && sudo dpkg -i --force-confnew elasticsearch-1.7.5.deb && sudo service elasticsearch restart
 
 install:
   - make setup-ci
+
+before_script:
+  - sleep 10
 
 script:
   - make coverage
