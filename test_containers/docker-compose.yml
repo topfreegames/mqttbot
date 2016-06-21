@@ -27,7 +27,7 @@ services:
   elasticsearch:
     image: elasticsearch:1.7.5
     ports:
-      - "9200:9200"
+      - "9123:9200"
       - "9300:9300"
 
 networks:
