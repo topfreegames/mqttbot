@@ -33,7 +33,8 @@ func InitRedisPool() {
 	once.Do(func() {
 		loadDefaultConfigurations()
 		redisPool = redis.NewPool(func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", viper.GetString("redis.host"), viper.GetInt("redis.port")))
+			c, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", viper.GetString("redis.host"),
+				viper.GetInt("redis.port")), redis.DialPassword(viper.GetString("redis.password")))
 			if err != nil {
 				if err != nil {
 					logger.Logger.Fatal(err)
