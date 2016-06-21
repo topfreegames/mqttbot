@@ -1,8 +1,9 @@
 language: go
 
 env:
-  - DOCKER_VERSION: 1.10.1-0~trusty
-  - DOCKER_COMPOSE_VERSION: 1.7.1
+  global:
+    - DOCKER_VERSION=1.10.1-0~trusty
+    - DOCKER_COMPOSE_VERSION=1.7.1
 
 go:
   - 1.6.2
@@ -13,6 +14,7 @@ services:
   - docker
 
 before_install:
+  - apt-cache madison docker-engine
   # upgrade docker-engine to specific version
   - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
   - sudo rm /usr/local/bin/docker-compose
@@ -24,11 +26,12 @@ install:
   - make setup-ci
 
 before_script:
+  - docker version
+  - docker-compose version
+  - make run-containers
   - sleep 10
 
 script:
-  - docker version
-  - docker-compose version
   - make coverage
   - $HOME/gopath/bin/goveralls -coverprofile coverage-all.out -service=travis-ci
 

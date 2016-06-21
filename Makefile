@@ -9,12 +9,14 @@ setup-ci:
 	@sudo add-apt-repository -y ppa:masterminds/glide && sudo apt-get update
 	@sudo apt-get install -y glide
 	@go get github.com/mattn/goveralls
-	@cd test_containers && docker-compose up -d && cd ..
 	@glide install
 
 build:
 	@go build $(PACKAGES)
 	@go build
+
+run-containers:
+	@cd test_containers && docker-compose up -d && cd ..
 
 coverage:
 	@echo "mode: count" > coverage-all.out
