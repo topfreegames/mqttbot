@@ -28,6 +28,7 @@ install:
 before_script:
   - make run-containers
   - sleep 15
+  - curl http://localhost:9123
 
 script:
   - make coverage
