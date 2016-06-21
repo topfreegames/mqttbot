@@ -18,10 +18,13 @@ build:
 run-containers:
 	@cd test_containers && docker-compose up -d && cd ..
 
+kill-containers:
+	@cd test_containers && docker-compose stop && cd ..
+
 coverage:
 	@echo "mode: count" > coverage-all.out
 	@$(foreach pkg,$(PACKAGES),\
-		go test -coverprofile=coverage.out -covermode=count $(pkg);\
+		go test -coverprofile=coverage.out -covermode=count $(pkg) || exit 1 &&\
 		tail -n +2 coverage.out >> coverage-all.out;)
 run:
 	@go run main.go start
