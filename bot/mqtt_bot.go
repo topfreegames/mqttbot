@@ -7,8 +7,10 @@ import (
 	"sync"
 
 	"github.com/eclipse/paho.mqtt.golang"
+	"github.com/garyburd/redigo/redis"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
+	"github.com/topfreegames/mqttbot/modules"
 	"github.com/topfreegames/mqttbot/mqttclient"
 	"github.com/topfreegames/mqttbot/plugins"
 )
@@ -53,6 +55,7 @@ var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 // GetMqttBot returns a initialized mqtt bot
 func GetMqttBot(config *viper.Viper) *MqttBot {
 	once.Do(func() {
+		addCredentialsToRedis(config)
 		mqttBot = &MqttBot{Config: config}
 		mqttBot.Client = mqttclient.GetMqttClient(config, onClientConnectHandler)
 		mqttBot.setupPlugins()
@@ -97,5 +100,24 @@ func (b *MqttBot) StartBot() {
 		}
 		logger.Logger.Debug(fmt.Sprintf("Subscribed to %s", topic))
 		b.Subscriptions = append(b.Subscriptions, subscriptionNow)
+	}
+}
+
+func addCredentialsToRedis(config *viper.Viper) {
+	user := config.GetString("mqttserver.user")
+	pass := config.GetString("mqttserver.pass")
+	hash := modules.GenHash(pass)
+	redisHost := config.GetString("redis.host")
+	redisPort := config.GetInt("redis.port")
+	redisPass := config.GetString("redis.password")
+	conn, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", redisHost, redisPort),
+		redis.DialPassword(redisPass))
+	if err != nil {
+		logger.Logger.Error("Error connecting to Redis")
+		return
+	}
+	defer conn.Close()
+	if _, err = conn.Do("SET", user, hash); err != nil {
+		logger.Logger.Error(fmt.Sprintf("Error adding pass to redis: %v", err))
 	}
 }
