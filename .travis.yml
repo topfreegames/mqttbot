@@ -26,10 +26,8 @@ install:
   - make setup-ci
 
 before_script:
-  - docker version
-  - docker-compose version
   - make run-containers
-  - sleep 10
+  - sleep 15
 
 script:
   - make coverage
