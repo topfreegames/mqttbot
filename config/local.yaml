@@ -41,3 +41,4 @@ logger:
   level: "debug"
 plugins:
   modulesPath: "plugins/load_modules.lua"
+  pluginsPath: "plugins/"

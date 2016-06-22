@@ -13,4 +13,12 @@ func TestGetApp(t *testing.T) {
 	if app.Port != 9999 || app.Host != "127.0.0.1" {
 		t.Fail()
 	}
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Fail()
+		}
+	}()
+
+	app = GetApp("127.0.0.1", 9999, "../config/invalid", false)
 }
