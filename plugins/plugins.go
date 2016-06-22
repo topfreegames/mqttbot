@@ -2,7 +2,6 @@ package plugins
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/cjoudrey/gluahttp"
@@ -58,7 +57,8 @@ func (p *Plugins) loadModules(L *lua.LState) {
 func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (success int, err error) {
 	L := lua.NewState()
 	p.loadModules(L)
-	L.DoFile(fmt.Sprintf("./plugins/%s.lua", plugin))
+	pluginFile := p.Config.GetString("plugins.pluginsPath") + plugin + ".lua"
+	L.DoFile(pluginFile)
 	defer L.Close()
 	if err := L.CallByParam(lua.P{
 		Fn:      L.GetGlobal("run_plugin"),

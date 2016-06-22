@@ -5,4 +5,5 @@ import (
 )
 
 func TestLogger(t *testing.T) {
+	SetupLogger("debug")
 }
