@@ -30,6 +30,7 @@ coverage:
 	@$(foreach pkg,$(PACKAGES),\
 		go test -coverprofile=coverage.out -covermode=count $(pkg) || exit 1 &&\
 		tail -n +2 coverage.out >> coverage-all.out;)
+
 run:
 	@go run main.go start
 

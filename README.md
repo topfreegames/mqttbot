@@ -6,19 +6,48 @@
 A utility bot for MQTT-based chat services. MqttBot is implemented in Go with
 support to Lua plugins.
 
+
+## Features
+
+MqttBot is an extensible MqttBot developed in Go with support for Lua plugins.
+
+The bot is capable of:
+- Listening on specific routes for specific patterns to trigger Lua plugins
+- Listen to healthcheck requests
+- Accepting new plugins by adding them to the configuration file
+
+The plugins loaded by default can:
+- Persist messages to Elastic Search
+- Send history messages requested by users
+- Register users to Redis (compatible with auth-plugin for Mosquitto)
+- Add user ACL to Redis (compatible with auth-plugin for Mosquitto)
+
 ## Setup
 
 Make sure you have go installed on your machine.
 
-Run `make deps` and `make build`
-
 You also need to have access to running instances of elasticsearch, Redis
 and a mosquitto server (auth plugin (jpmens/mosquitto-auth-plug) is supported).
 
-The suggestion to run elasticsearch locally is to run it inside docker. You can
-run the container executing `docker run -p 9200:9200 -p 9300:9300 elasticsearch`
-
 ## Running the application
 
-You can run the application once you have the other services running properly
-by executing `make run`
+If you want to run the application locally you can do so by running
+
+`
+make setup
+make build
+make run
+`
+
+You may need to change the configurations to point to your MQTT, ElasticSearch
+and Redis servers, or you can use the provided containers, they can be run
+by executing `make run-containers`
+
+## Running the tests
+
+The project is integrated with Travis CI and uses docker to run the needed services.
+
+If you are interested in running the tests yourself you will need docker (version 1.10
+and up) and docker-compose.
+
+To run the tests simply run `make run-tests`
