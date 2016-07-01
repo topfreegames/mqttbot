@@ -17,8 +17,8 @@ var once sync.Once
 
 // RedisModuleLoader loads the Redis module
 func RedisModuleLoader(L *lua.LState) int {
-	loadDefaultConfigurations()
-	InitRedisPool()
+	loadDefaultConfigurations(Config)
+	InitRedisPool(Config)
 	mod := L.SetFuncs(L.NewTable(), redisClientModuleExports)
 	L.Push(mod)
 	return 1
@@ -29,27 +29,28 @@ var redisClientModuleExports = map[string]lua.LGFunction{
 }
 
 // InitRedisPool starts the redis pool
-func InitRedisPool() {
+func InitRedisPool(config *viper.Viper) {
 	once.Do(func() {
-		loadDefaultConfigurations()
+		loadDefaultConfigurations(config)
+		logger.Logger.Info(fmt.Sprintf("Redis address: %s:%d", config.GetString("redis.host"), config.GetInt("redis.port")))
 		redisPool = redis.NewPool(func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", viper.GetString("redis.host"),
-				viper.GetInt("redis.port")), redis.DialPassword(viper.GetString("redis.password")))
+			c, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", config.GetString("redis.host"),
+				config.GetInt("redis.port")), redis.DialPassword(config.GetString("redis.password")))
 			if err != nil {
 				if err != nil {
 					logger.Logger.Fatal(err)
 				}
 			}
 			return c, err
-		}, viper.GetInt("redis.maxPoolSize"))
+		}, config.GetInt("redis.maxPoolSize"))
 	})
 }
 
-func loadDefaultConfigurations() {
-	viper.SetDefault("redis.host", "localhost")
-	viper.SetDefault("redis.port", 6379)
-	viper.SetDefault("redis.password", "")
-	viper.SetDefault("redis.maxPoolSize", 10)
+func loadDefaultConfigurations(config *viper.Viper) {
+	config.SetDefault("redis.host", "localhost")
+	config.SetDefault("redis.port", 6379)
+	config.SetDefault("redis.password", "")
+	config.SetDefault("redis.maxPoolSize", 10)
 }
 
 // ExecuteCommand executes the command given by the Lua script
