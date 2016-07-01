@@ -9,7 +9,7 @@ import (
 func TestGetApp(t *testing.T) {
 	viper.SetDefault("logger.level", "DEBUG")
 	viper.SetConfigFile("../config/test.yml")
-	app := GetApp("127.0.0.1", 9999, "../config/test.yml", false)
+	app := GetApp("127.0.0.1", 9999, false)
 	if app.Port != 9999 || app.Host != "127.0.0.1" {
 		t.Fail()
 	}
@@ -20,5 +20,6 @@ func TestGetApp(t *testing.T) {
 		}
 	}()
 
-	app = GetApp("127.0.0.1", 9999, "../config/invalid", false)
+	viper.SetConfigFile("../config/invalid")
+	app = GetApp("127.0.0.1", 9999, false)
 }

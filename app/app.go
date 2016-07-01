@@ -11,26 +11,22 @@ import (
 
 // App is the struct that defines the application
 type App struct {
-	Debug      bool
-	Port       int
-	Host       string
-	ConfigPath string
-	Config     *viper.Viper
-	Api        *iris.Framework
-	MqttBot    *bot.MqttBot
+	Debug   bool
+	Port    int
+	Host    string
+	Api     *iris.Framework
+	MqttBot *bot.MqttBot
 }
 
 // GetApp creates an app given the parameters
-func GetApp(host string, port int, configPath string, debug bool) *App {
+func GetApp(host string, port int, debug bool) *App {
 	logger.SetupLogger(viper.GetString("logger.level"))
 	logger.Logger.Debug(
-		fmt.Sprintf("Starting app with host: %s, port: %d, configFile: %s", host, port, configPath))
+		fmt.Sprintf("Starting app with host: %s, port: %d", host, port))
 	app := &App{
-		Host:       host,
-		Port:       port,
-		Debug:      debug,
-		ConfigPath: configPath,
-		Config:     viper.New(),
+		Host:  host,
+		Port:  port,
+		Debug: debug,
 	}
 	app.Configure()
 	return app
@@ -44,22 +40,21 @@ func (app *App) Configure() {
 }
 
 func (app *App) setConfigurationDefaults() {
-	app.Config.SetDefault("healthcheck.workingText", "WORKING")
+	viper.SetDefault("healthcheck.workingText", "WORKING")
 }
 
 func (app *App) loadConfiguration() {
-	app.Config.SetConfigFile(app.ConfigPath)
-	app.Config.AutomaticEnv()
+	viper.AutomaticEnv()
 
-	if err := app.Config.ReadInConfig(); err == nil {
+	if err := viper.ReadInConfig(); err == nil {
 		logger.Logger.Debug("Config file read successfully")
 	} else {
-		panic(fmt.Sprintf("Could not load configuration file %s", app.ConfigPath))
+		panic(fmt.Sprintf("Could not load configuration file"))
 	}
 }
 
 func (app *App) configureApplication() {
-	app.MqttBot = bot.GetMqttBot(app.Config)
+	app.MqttBot = bot.GetMqttBot()
 	app.Api = iris.New()
 	a := app.Api
 

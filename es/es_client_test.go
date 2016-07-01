@@ -7,11 +7,10 @@ import (
 )
 
 func TestES(t *testing.T) {
-	config := viper.New()
-	config.SetConfigFile("../config/test.yml")
-	config.AutomaticEnv()
-	config.ReadInConfig()
-	client := GetESClient(config)
+	viper.SetConfigFile("../config/test.yml")
+	viper.AutomaticEnv()
+	viper.ReadInConfig()
+	client := GetESClient()
 	if client == nil {
 		t.Fail()
 	}

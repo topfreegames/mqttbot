@@ -15,14 +15,12 @@ import (
 // Plugins is the default type a plugin implements
 type Plugins struct {
 	PluginMappings []map[string]string
-	Config         *viper.Viper
 }
 
 // GetPlugins returns the list of plugins
-func GetPlugins(config *viper.Viper) *Plugins {
+func GetPlugins() *Plugins {
 	plugins := &Plugins{
 		PluginMappings: []map[string]string{},
-		Config:         config,
 	}
 	return plugins
 }
@@ -33,7 +31,7 @@ func (p *Plugins) SetupPlugins() {
 }
 
 func (p *Plugins) preloadModules() {
-	loadModulesPath := p.Config.GetString("plugins.modulesPath")
+	loadModulesPath := viper.GetString("plugins.modulesPath")
 	L := lua.NewState()
 	defer L.Close()
 	p.loadModules(L)
@@ -44,7 +42,6 @@ func (p *Plugins) preloadModules() {
 }
 
 func (p *Plugins) loadModules(L *lua.LState) {
-	modules.Config = p.Config
 	L.PreloadModule("persistence_module", modules.PersistenceModuleLoader)
 	L.PreloadModule("mqttclient_module", modules.MqttClientModuleLoader)
 	L.PreloadModule("redis_module", modules.RedisModuleLoader)
@@ -57,7 +54,7 @@ func (p *Plugins) loadModules(L *lua.LState) {
 func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (success int, err error) {
 	L := lua.NewState()
 	p.loadModules(L)
-	pluginFile := p.Config.GetString("plugins.pluginsPath") + plugin + ".lua"
+	pluginFile := viper.GetString("plugins.pluginsPath") + plugin + ".lua"
 	L.DoFile(pluginFile)
 	defer L.Close()
 	if err := L.CallByParam(lua.P{

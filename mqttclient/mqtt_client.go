@@ -14,7 +14,6 @@ import (
 type MqttClient struct {
 	MqttServerHost string
 	MqttServerPort int
-	Config         *viper.Viper
 	MqttClient     mqtt.Client
 }
 
@@ -22,9 +21,9 @@ var client *MqttClient
 var once sync.Once
 
 // GetMqttClient creates the mqttclient and returns it
-func GetMqttClient(config *viper.Viper, onConnectHandler mqtt.OnConnectHandler) *MqttClient {
+func GetMqttClient(onConnectHandler mqtt.OnConnectHandler) *MqttClient {
 	once.Do(func() {
-		client = &MqttClient{Config: config}
+		client = &MqttClient{}
 		client.configure(onConnectHandler)
 	})
 	return client
@@ -37,24 +36,24 @@ func (mc *MqttClient) configure(onConnectHandler mqtt.OnConnectHandler) {
 }
 
 func (mc *MqttClient) setConfigurationDefaults() {
-	mc.Config.SetDefault("mqttserver.host", "localhost")
-	mc.Config.SetDefault("mqttserver.port", 1883)
-	mc.Config.SetDefault("mqttserver.user", "admin")
-	mc.Config.SetDefault("mqttserver.pass", "admin")
-	mc.Config.SetDefault("mqttserver.subscriptions", []map[string]string{})
+	viper.SetDefault("mqttserver.host", "localhost")
+	viper.SetDefault("mqttserver.port", 1883)
+	viper.SetDefault("mqttserver.user", "admin")
+	viper.SetDefault("mqttserver.pass", "admin")
+	viper.SetDefault("mqttserver.subscriptions", []map[string]string{})
 }
 
 func (mc *MqttClient) configureClient() {
-	mc.MqttServerHost = mc.Config.GetString("mqttserver.host")
-	mc.MqttServerPort = mc.Config.GetInt("mqttserver.port")
+	mc.MqttServerHost = viper.GetString("mqttserver.host")
+	mc.MqttServerPort = viper.GetInt("mqttserver.port")
 }
 
 func (mc *MqttClient) start(onConnectHandler mqtt.OnConnectHandler) {
 	logger.Logger.Debug("Initializing mqtt client")
 
 	opts := mqtt.NewClientOptions().AddBroker(fmt.Sprintf("tcp://%s:%d", mc.MqttServerHost, mc.MqttServerPort)).SetClientID("mqttbot")
-	opts.SetUsername(mc.Config.GetString("mqttserver.user"))
-	opts.SetPassword(mc.Config.GetString("mqttserver.pass"))
+	opts.SetUsername(viper.GetString("mqttserver.user"))
+	opts.SetPassword(viper.GetString("mqttserver.pass"))
 	opts.SetKeepAlive(3 * time.Second)
 	opts.SetPingTimeout(5 * time.Second)
 	opts.SetMaxReconnectInterval(30 * time.Second)

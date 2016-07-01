@@ -4,16 +4,12 @@ import (
 	"fmt"
 
 	"github.com/eclipse/paho.mqtt.golang"
-	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/mqttclient"
 	"github.com/yuin/gopher-lua"
 )
 
 var mqttClient mqtt.Client
-
-// Config is the configuration for the plugins
-var Config *viper.Viper
 
 // MqttClientModuleLoader loads the module and prepares it
 func MqttClientModuleLoader(L *lua.LState) int {
@@ -28,7 +24,7 @@ var mqttClientModuleExports = map[string]lua.LGFunction{
 }
 
 func configureMqttModule() {
-	mqttClient = mqttclient.GetMqttClient(Config, nil).MqttClient
+	mqttClient = mqttclient.GetMqttClient(nil).MqttClient
 }
 
 // SendMessage sends message to mqtt
