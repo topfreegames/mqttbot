@@ -110,6 +110,7 @@ func addCredentialsToRedis(config *viper.Viper) {
 	redisHost := config.GetString("redis.host")
 	redisPort := config.GetInt("redis.port")
 	redisPass := config.GetString("redis.password")
+	logger.Logger.Info(fmt.Sprintf("Connecting to redis at %s:%d", redisHost, redisPort))
 	conn, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", redisHost, redisPort),
 		redis.DialPassword(redisPass))
 	if err != nil {
