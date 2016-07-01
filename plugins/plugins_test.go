@@ -10,16 +10,15 @@ import (
 )
 
 func TestPlugins(t *testing.T) {
-	config := viper.New()
-	config.SetConfigFile("../config/test.yml")
-	config.AutomaticEnv()
-	config.ReadInConfig()
-	plugins := GetPlugins(config)
+	viper.SetConfigFile("../config/test.yml")
+	viper.AutomaticEnv()
+	viper.ReadInConfig()
+	plugins := GetPlugins()
 	if plugins == nil {
 		t.Fail()
 	}
 
-	if !addCredentialsToRedis(config) {
+	if !addCredentialsToRedis() {
 		t.Fail()
 	}
 	plugins.SetupPlugins()
@@ -31,13 +30,13 @@ func TestPlugins(t *testing.T) {
 	}
 }
 
-func addCredentialsToRedis(config *viper.Viper) bool {
-	user := config.GetString("mqttserver.user")
-	pass := config.GetString("mqttserver.pass")
+func addCredentialsToRedis() bool {
+	user := viper.GetString("mqttserver.user")
+	pass := viper.GetString("mqttserver.pass")
 	hash := modules.GenHash(pass)
-	redisHost := config.GetString("redis.host")
-	redisPort := config.GetInt("redis.port")
-	redisPass := config.GetString("redis.password")
+	redisHost := viper.GetString("redis.host")
+	redisPort := viper.GetInt("redis.port")
+	redisPass := viper.GetString("redis.password")
 	conn, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", redisHost, redisPort),
 		redis.DialPassword(redisPass))
 	if err != nil {

@@ -40,7 +40,7 @@ var persistenceModuleExports = map[string]lua.LGFunction{
 }
 
 func configurePersistenceModule() {
-	esclient = es.GetESClient(Config)
+	esclient = es.GetESClient()
 }
 
 func IndexMessage(L *lua.LState) int {

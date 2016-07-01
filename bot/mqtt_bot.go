@@ -53,18 +53,18 @@ var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 // GetMqttBot returns a initialized mqtt bot
-func GetMqttBot(config *viper.Viper) *MqttBot {
+func GetMqttBot() *MqttBot {
 	once.Do(func() {
-		addCredentialsToRedis(config)
-		mqttBot = &MqttBot{Config: config}
-		mqttBot.Client = mqttclient.GetMqttClient(config, onClientConnectHandler)
+		addCredentialsToRedis()
+		mqttBot = &MqttBot{}
+		mqttBot.Client = mqttclient.GetMqttClient(onClientConnectHandler)
 		mqttBot.setupPlugins()
 	})
 	return mqttBot
 }
 
 func (b *MqttBot) setupPlugins() {
-	b.Plugins = plugins.GetPlugins(b.Config)
+	b.Plugins = plugins.GetPlugins()
 	b.Plugins.SetupPlugins()
 }
 
@@ -75,7 +75,7 @@ var onClientConnectHandler = func(client mqtt.Client) {
 // StartBot starts the bot, it subscribes the bot to the topics defined in the
 // configuration file
 func (b *MqttBot) StartBot() {
-	subscriptions := b.Config.Get("mqttserver.subscriptionRequests").([]interface{})
+	subscriptions := viper.Get("mqttserver.subscriptionRequests").([]interface{})
 	client := b.Client.MqttClient
 	b.Subscriptions = []*Subscription{}
 	for _, s := range subscriptions {
@@ -103,13 +103,13 @@ func (b *MqttBot) StartBot() {
 	}
 }
 
-func addCredentialsToRedis(config *viper.Viper) {
-	user := config.GetString("mqttserver.user")
-	pass := config.GetString("mqttserver.pass")
+func addCredentialsToRedis() {
+	user := viper.GetString("mqttserver.user")
+	pass := viper.GetString("mqttserver.pass")
 	hash := modules.GenHash(pass)
-	redisHost := config.GetString("redis.host")
-	redisPort := config.GetInt("redis.port")
-	redisPass := config.GetString("redis.password")
+	redisHost := viper.GetString("redis.host")
+	redisPort := viper.GetInt("redis.port")
+	redisPass := viper.GetString("redis.password")
 	logger.Logger.Info(fmt.Sprintf("Connecting to redis at %s:%d", redisHost, redisPort))
 	conn, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", redisHost, redisPort),
 		redis.DialPassword(redisPass))
