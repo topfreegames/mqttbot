@@ -104,6 +104,10 @@ func (b *MqttBot) StartBot() {
 }
 
 func addCredentialsToRedis() {
+	viper.SetDefault("redis.host", "localhost")
+	viper.SetDefault("redis.port", 6379)
+	viper.SetDefault("redis.password", "")
+	viper.SetDefault("redis.maxPoolSize", 10)
 	user := viper.GetString("mqttserver.user")
 	pass := viper.GetString("mqttserver.pass")
 	hash := modules.GenHash(pass)
@@ -114,7 +118,7 @@ func addCredentialsToRedis() {
 	conn, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", redisHost, redisPort),
 		redis.DialPassword(redisPass))
 	if err != nil {
-		logger.Logger.Error("Error connecting to Redis")
+		logger.Logger.Fatal(fmt.Sprintf("Error connecting to Redis: %v", err))
 		return
 	}
 	defer conn.Close()
