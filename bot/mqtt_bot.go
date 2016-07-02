@@ -118,8 +118,11 @@ func addCredentialsToRedis() {
 	conn, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", redisHost, redisPort),
 		redis.DialPassword(redisPass))
 	if err != nil {
-		logger.Logger.Fatal(fmt.Sprintf("Error connecting to Redis: %v", err))
-		return
+		conn, err = redis.Dial("tcp", fmt.Sprintf("%s:%d", redisHost, redisPort))
+		if err != nil {
+			logger.Logger.Fatal(fmt.Sprintf("Error connecting to Redis: %v", err))
+			return
+		}
 	}
 	defer conn.Close()
 	if _, err = conn.Do("SET", user, hash); err != nil {

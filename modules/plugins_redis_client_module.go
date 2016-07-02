@@ -34,12 +34,18 @@ func InitRedisPool() {
 		loadDefaultConfigurations()
 		logger.Logger.Info(fmt.Sprintf("Redis address: %s:%d", viper.GetString("redis.host"), viper.GetInt("redis.port")))
 		redisPool = redis.NewPool(func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", viper.GetString("redis.host"),
-				viper.GetInt("redis.port")), redis.DialPassword(viper.GetString("redis.password")))
-			if err != nil {
+			if viper.GetString("redis.password") != "" {
+				c, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", viper.GetString("redis.host"),
+					viper.GetInt("redis.port")), redis.DialPassword(viper.GetString("redis.password")))
 				if err != nil {
 					logger.Logger.Fatal(err)
 				}
+				return c, err
+			}
+			c, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", viper.GetString("redis.host"),
+				viper.GetInt("redis.port")))
+			if err != nil {
+				logger.Logger.Fatal(err)
 			}
 			return c, err
 		}, viper.GetInt("redis.maxPoolSize"))
