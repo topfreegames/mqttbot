@@ -7,15 +7,17 @@ import (
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/bot"
 	"github.com/topfreegames/mqttbot/logger"
+	"github.com/topfreegames/mqttbot/redisclient"
 )
 
 // App is the struct that defines the application
 type App struct {
-	Debug   bool
-	Port    int
-	Host    string
-	Api     *iris.Framework
-	MqttBot *bot.MqttBot
+	Debug       bool
+	Port        int
+	Host        string
+	Api         *iris.Framework
+	MqttBot     *bot.MqttBot
+	RedisClient *redisclient.RedisClient
 }
 
 // GetApp creates an app given the parameters
@@ -59,6 +61,9 @@ func (app *App) configureApplication() {
 	a := app.Api
 
 	a.Get("/healthcheck", HealthCheckHandler(app))
+	a.Get("/history/*topic", HistoryHandler(app))
+
+	app.RedisClient = redisclient.GetRedisClient(viper.GetString("redis.host"), viper.GetInt("redis.port"), viper.GetString("redis.password"))
 }
 
 // Start starts the application
