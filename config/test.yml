@@ -34,7 +34,7 @@ elasticsearch:
     chat: '{ "mappings": { "message":{"_ttl": { "enabled": true, "default": "2d" }}}}'
 redis:
   host: "localhost"
-  port: 6379
+  port: 4444
   password: ""
   maxPoolSize: 10
 logger:
