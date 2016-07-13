@@ -7,7 +7,7 @@ import (
 )
 
 func TestES(t *testing.T) {
-	viper.SetConfigFile("../config/test.yml")
+	viper.SetConfigFile("../config/test.yaml")
 	viper.AutomaticEnv()
 	viper.ReadInConfig()
 	client := GetESClient()
