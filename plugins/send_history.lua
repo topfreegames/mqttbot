@@ -13,7 +13,7 @@ function run_plugin(topic, payload)
   end
   local payload_table = {}
   for i = 1, #payloads do
-    payload_table[i] = {from = payloads[i]["from"], message = payloads[i]["message"], timestamp = payloads[i]["timestamp"]..""} 
+    payload_table[i] = {id = payloads[i]["id"], timestamp = payloads[i]["timestamp"].."", payload = payloads[i]["payload"]} 
   end
   client.send_message(history_topic.."/history/"..user_requesting, 2, false, json.encode(payload_table))
   return nil, 0
