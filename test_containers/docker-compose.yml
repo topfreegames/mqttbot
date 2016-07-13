@@ -27,6 +27,5 @@ services:
     ports:
       - "9123:9200"
       - "9300:9300"
-
 networks:
   mosqnet:

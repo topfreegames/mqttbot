@@ -8,7 +8,7 @@ import (
 
 func TestGetApp(t *testing.T) {
 	viper.SetDefault("logger.level", "DEBUG")
-	viper.SetConfigFile("../config/test.yml")
+	viper.SetConfigFile("../config/test.yaml")
 	app := GetApp("127.0.0.1", 9999, false)
 	if app.Port != 9999 || app.Host != "127.0.0.1" {
 		t.Fail()
