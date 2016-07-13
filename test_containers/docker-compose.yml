@@ -4,10 +4,9 @@ services:
   redis:
     image: redis:3.2
     ports:
-      - "6379:6379"
+      - "4444:6379"
     networks:
       - mosqnet
-
   mosquitto:
     image: jllopis/mosquitto:v1.4.9
     volumes:
@@ -23,7 +22,6 @@ services:
       - redis
     labels:
       - "local.example.description=Mosquitto v1.4.9 MQTT server"
-
   elasticsearch:
     image: elasticsearch:1.7.5
     ports:
