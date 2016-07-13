@@ -13,7 +13,7 @@ import (
 
 type Message struct {
 	Id        string `json:"id"`
-	Timestamp int32  `json:"timstamp"`
+	Timestamp int32  `json:"timestamp"`
 	Payload   string `json:"payload"`
 	Topic     string `json:"topic"`
 }
@@ -29,6 +29,7 @@ func HistoryHandler(app *App) func(c *iris.Context) {
 		if limit == 0 {
 			limit = 10
 		}
+		logger.Logger.Debugf("user %s is asking for history for topic %s with args from=%d and limit=%d", userId, topic, from, limit)
 		rc := app.RedisClient.Pool.Get()
 		rc.Send("MULTI")
 		rc.Send("GET", userId)
