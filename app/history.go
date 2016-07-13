@@ -11,17 +11,11 @@ import (
 	"gopkg.in/topfreegames/elastic.v2"
 )
 
-// PayloadStruct contains the fields of a payload
-type PayloadStruct struct {
-	From      string `json:"from"`
-	Message   string `json:"message"`
-	Timestamp int32  `json:"timestamp"`
-	Id        string `json:"id"`
-}
-
 type Message struct {
-	Payload PayloadStruct `json:"payload"`
-	Topic   string        `json:"topic"`
+	Id        string `json:"id"`
+	Timestamp int32  `json:"timstamp"`
+	Payload   string `json:"payload"`
+	Topic     string `json:"topic"`
 }
 
 // HistoryHandler is the handler responsible for sending the rooms history to the player
@@ -49,21 +43,21 @@ func HistoryHandler(app *App) func(c *iris.Context) {
 		if redisResults[0] != nil && redisResults[1] != nil {
 			termQuery := elastic.NewQueryStringQuery(fmt.Sprintf("topic:\"%s\"", topic))
 			searchResults, err := esclient.Search().Index("chat").Query(termQuery).
-				Sort("payload.timestamp", false).From(from).Size(limit).Do()
+				Sort("timestamp", false).From(from).Size(limit).Do()
 			if err != nil {
 				logger.Logger.Error(err.Error())
 				c.SetStatusCode(iris.StatusInternalServerError)
 				return
 			}
-			payloads := []PayloadStruct{}
+			messages := []Message{}
 			var ttyp Message
 			for _, item := range searchResults.Each(reflect.TypeOf(ttyp)) {
 				if t, ok := item.(Message); ok {
-					payloads = append(payloads, t.Payload)
+					messages = append(messages, t)
 				}
 			}
-			jsonPayloads, _ := json.Marshal(payloads)
-			c.Write(fmt.Sprintf("%s", jsonPayloads))
+			jsonMessages, _ := json.Marshal(messages)
+			c.Write(fmt.Sprintf("%s", jsonMessages))
 			c.SetStatusCode(iris.StatusOK)
 		} else {
 			c.SetStatusCode(iris.StatusForbidden)
