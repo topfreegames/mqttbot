@@ -1,7 +1,10 @@
 package mqttclient
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"sync"
 	"time"
 
@@ -41,6 +44,7 @@ func (mc *MqttClient) setConfigurationDefaults() {
 	viper.SetDefault("mqttserver.user", "admin")
 	viper.SetDefault("mqttserver.pass", "admin")
 	viper.SetDefault("mqttserver.subscriptions", []map[string]string{})
+	viper.SetDefault("mqttserver.ca_cert_file", "")
 }
 
 func (mc *MqttClient) configureClient() {
@@ -51,7 +55,29 @@ func (mc *MqttClient) configureClient() {
 func (mc *MqttClient) start(onConnectHandler mqtt.OnConnectHandler) {
 	logger.Logger.Debug("Initializing mqtt client")
 
-	opts := mqtt.NewClientOptions().AddBroker(fmt.Sprintf("tcp://%s:%d", mc.MqttServerHost, mc.MqttServerPort)).SetClientID("mqttbot")
+	useTls := viper.GetBool("mqttserver.usetls")
+	protocol := "tcp"
+	if useTls {
+		protocol = "ssl"
+	}
+
+	opts := mqtt.NewClientOptions().AddBroker(fmt.Sprintf("%s://%s:%d", protocol, mc.MqttServerHost, mc.MqttServerPort)).SetClientID("mqttbot")
+
+	if useTls {
+		logger.Logger.Info("mqttclient using tls")
+		certpool := x509.NewCertPool()
+		if viper.GetString("mqttserver.ca_cert_file") != "" {
+			pemCerts, err := ioutil.ReadFile(viper.GetString("mqttserver.ca_cert_file"))
+			if err == nil {
+				certpool.AppendCertsFromPEM(pemCerts)
+			} else {
+				logger.Logger.Error(err.Error())
+			}
+		}
+		tlsConfig := &tls.Config{InsecureSkipVerify: viper.GetBool("mqttserver.insecure_tls"), ClientAuth: tls.NoClientCert, RootCAs: certpool}
+		opts.SetTLSConfig(tlsConfig)
+	}
+
 	opts.SetUsername(viper.GetString("mqttserver.user"))
 	opts.SetPassword(viper.GetString("mqttserver.pass"))
 	opts.SetKeepAlive(3 * time.Second)

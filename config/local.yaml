@@ -6,6 +6,8 @@ mqttserver:
   port: 1883
   user: "admin"
   pass: "admin"
+  usetls: false
+  insecure_tls: true
   subscriptionRequests:
     - topic: 'chat/+/room/+'
       qos: 2
@@ -34,7 +36,7 @@ elasticsearch:
     chat: '{ "mappings": { "message":{"_ttl": { "enabled": true, "default": "2d" }}}}'
 redis:
   host: "localhost"
-  port: 4444
+  port: 6379
   password: ""
   maxPoolSize: 10
 logger:

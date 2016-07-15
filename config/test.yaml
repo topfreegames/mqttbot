@@ -6,6 +6,8 @@ mqttserver:
   port: 1883
   user: "admin"
   pass: "admin"
+  usetls: false
+  insecure_tls: true
   subscriptionRequests:
     - topic: 'chat/+/room/+'
       qos: 2
