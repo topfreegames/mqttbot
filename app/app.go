@@ -75,5 +75,10 @@ func (app *App) configureApplication() {
 
 // Start starts the application
 func (app *App) Start() {
-	app.Api.Listen(fmt.Sprintf("%s:%d", app.Host, app.Port))
+	if viper.GetBool("api.tls") {
+		logger.Logger.Info("Api listening using TLS!")
+		app.Api.ListenTLS(fmt.Sprintf("%s:%d", app.Host, app.Port), viper.GetString("api.certFile"), viper.GetString("api.keyFile"))
+	} else {
+		app.Api.Listen(fmt.Sprintf("%s:%d", app.Host, app.Port))
+	}
 }
