@@ -1,5 +1,5 @@
 hash: ae6fd984648fd6c555e7fd74ad3773ee197bc198f8f3d3f1a8e642de5b157aae
-updated: 2016-07-13T15:53:42.374923588-03:00
+updated: 2016-07-20T20:39:27.410402056-03:00
 imports:
 - name: github.com/ajg/form
   version: 7ff89c75808766205bfa4411abb436c98c33eb5e
@@ -39,7 +39,7 @@ imports:
 - name: github.com/fatih/color
   version: 87d4004f2ab62d0d255e0a38f1680aa534549fe3
 - name: github.com/fatih/structs
-  version: be738c8546f55b34e60125afa50ed73a9a9c460e
+  version: 14f46232cd7bc732dc67313a9e4d3d210e082587
 - name: github.com/flosch/pongo2
   version: 7f5515449ea9bbeb00256d9cbb654c556e7d0146
 - name: github.com/franela/goblin
