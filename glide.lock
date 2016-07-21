@@ -1,5 +1,5 @@
-hash: f82a8b2100aaaf326905bbecd02ab38d1ebaa8d7fced4db2d0167f8895a96a55
-updated: 2016-07-21T13:44:24.122965971-03:00
+hash: 2ee889e630bcc2db74fe85ff6b92da7e5f8c83b92c3a4b03a3379037eb5bbf86
+updated: 2016-07-21T13:49:01.394116242-03:00
 imports:
 - name: github.com/ajg/form
   version: 7ff89c75808766205bfa4411abb436c98c33eb5e
@@ -165,8 +165,10 @@ imports:
   subpackages:
   - assert
   - require
+- name: github.com/valyala/bytebufferpool
+  version: 8ebd0474e5a2f0a5c7a74ad2bf421a1d1a90264f
 - name: github.com/valyala/fasthttp
-  version: d42167fd04f636e20b005e9934159e95454233c7
+  version: 45697fe30a130ec6a54426a069c82f3abe76b63d
   subpackages:
   - fasthttpadaptor
   - fasthttputil

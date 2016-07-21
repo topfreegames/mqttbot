@@ -27,7 +27,14 @@ func Get(app *App, url string, t *testing.T) *httpexpect.Response {
 }
 
 func GetWithQuery(app *App, url string, queryKey string, queryValue string, t *testing.T) *httpexpect.Response {
-	handler := app.Api.NoListen().Handler
+
+	srv := app.Api.Servers.Main()
+
+	if srv == nil { // maybe the user called this after .Listen/ListenTLS/ListenUNIX, the t
+		srv = app.Api.ListenVirtual(app.Api.Config.Tester.ListeningAddr)
+	}
+
+	handler := srv.Handler
 	e := httpexpect.WithConfig(httpexpect.Config{
 		Reporter: httpexpect.NewAssertReporter(t),
 		Client: &http.Client{
@@ -39,7 +46,14 @@ func GetWithQuery(app *App, url string, queryKey string, queryValue string, t *t
 }
 
 func sendRequest(app *App, method, url string, t *testing.T) *httpexpect.Request {
-	handler := app.Api.NoListen().Handler
+
+	srv := app.Api.Servers.Main()
+
+	if srv == nil { // maybe the user called this after .Listen/ListenTLS/ListenUNIX, the t
+		srv = app.Api.ListenVirtual(app.Api.Config.Tester.ListeningAddr)
+	}
+
+	handler := srv.Handler
 
 	e := httpexpect.WithConfig(httpexpect.Config{
 		Reporter: httpexpect.NewAssertReporter(t),
