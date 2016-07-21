@@ -5,7 +5,6 @@ import:
 - package: github.com/garyburd/redigo
   subpackages:
   - redis
-- package: github.com/kataras/iris
 - package: github.com/layeh/gopher-json
 - package: github.com/layeh/gopher-luar
 - package: github.com/op/go-logging
@@ -21,3 +20,6 @@ import:
 - package: github.com/satori/go.uuid
 - package: github.com/gavv/httpexpect
 - package: github.com/ajg/form
+- package: github.com/kataras/iris
+  subpackages:
+  - iris
