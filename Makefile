@@ -21,10 +21,12 @@ run-containers:
 kill-containers:
 	@cd test_containers && docker-compose stop && cd ..
 
-run-tests: kill-containers run-containers
+run-tests: run-containers
 	@sleep 5 #wait for es to start
 	@make coverage
 	@make kill-containers
+
+test: run-tests
 
 coverage:
 	@echo "mode: count" > coverage-all.out
