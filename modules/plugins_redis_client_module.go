@@ -61,6 +61,8 @@ func loadDefaultConfigurations() {
 
 // ExecuteCommand executes the command given by the Lua script
 func ExecuteCommand(L *lua.LState) int {
+	redisConn := redisPool.Get()
+	defer redisConn.Close()
 	command := L.Get(1)
 	argNum := L.Get(2)
 	var args []interface{}
@@ -69,7 +71,7 @@ func ExecuteCommand(L *lua.LState) int {
 	}
 	logger.Logger.Debug(fmt.Sprintf("redismod command %s and args %s", command, args))
 	L.Pop(2 + int(lua.LVAsNumber(argNum)))
-	status, err := redisPool.Get().Do(command.String(), args...)
+	status, err := redisConn.Do(command.String(), args...)
 	if err != nil {
 		L.Push(lua.LString(fmt.Sprintf("%s", err)))
 		L.Push(L.ToNumber(1))
