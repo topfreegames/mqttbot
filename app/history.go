@@ -31,6 +31,7 @@ func HistoryHandler(app *App) func(c *iris.Context) {
 		}
 		logger.Logger.Debugf("user %s is asking for history for topic %s with args from=%d and limit=%d", userId, topic, from, limit)
 		rc := app.RedisClient.Pool.Get()
+		defer rc.Close()
 		rc.Send("MULTI")
 		rc.Send("GET", userId)
 		rc.Send("GET", fmt.Sprintf("%s-%s", userId, topic))
