@@ -3,6 +3,7 @@ package modules
 import (
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/layeh/gopher-luar"
 	"github.com/topfreegames/mqttbot/es"
@@ -12,8 +13,9 @@ import (
 )
 
 type Message struct {
-	Payload string `json:"payload"`
-	Topic   string `json:"topic"`
+	Timestamp time.Time `json:"timestamp"`
+	Payload   string    `json:"payload"`
+	Topic     string    `json:"topic"`
 }
 
 var esclient *elastic.Client
@@ -61,7 +63,7 @@ func QueryMessages(L *lua.LState) int {
 		int(lua.LVAsNumber(limit)), topic.String(), int(lua.LVAsNumber(start))))
 	termQuery := elastic.NewQueryStringQuery(fmt.Sprintf("topic:\"%s\"", topic.String()))
 	searchResults, err := esclient.Search().Index("chat").Query(termQuery).
-		Sort("payload.timestamp", false).From(int(lua.LVAsNumber(start))).
+		Sort("timestamp", false).From(int(lua.LVAsNumber(start))).
 		Size(int(lua.LVAsNumber(limit))).Do()
 	if err != nil {
 		L.Push(lua.LString(fmt.Sprintf("%s", err)))
