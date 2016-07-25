@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/kataras/iris"
 	"github.com/topfreegames/mqttbot/es"
@@ -12,10 +13,9 @@ import (
 )
 
 type Message struct {
-	Id        string `json:"id"`
-	Timestamp int32  `json:"timestamp"`
-	Payload   string `json:"payload"`
-	Topic     string `json:"topic"`
+	Timestamp time.Time `json:"timestamp"`
+	Payload   string    `json:"payload"`
+	Topic     string    `json:"topic"`
 }
 
 // HistoryHandler is the handler responsible for sending the rooms history to the player

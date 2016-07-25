@@ -13,7 +13,6 @@ import (
 
 	. "github.com/franela/goblin"
 	. "github.com/onsi/gomega"
-	"github.com/satori/go.uuid"
 	"github.com/topfreegames/mqttbot/es"
 	"github.com/topfreegames/mqttbot/redisclient"
 )
@@ -40,8 +39,7 @@ func TestHistoryHandler(t *testing.T) {
 
 			esclient := es.GetESClient()
 			testMessage := Message{
-				Id:        uuid.NewV4().String(),
-				Timestamp: int32(time.Now().Unix()),
+				Timestamp: time.Now(),
 				Payload:   "{\"test1\":\"test2\"}",
 				Topic:     "chat/teste",
 			}
