@@ -2,15 +2,14 @@ package es
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"strings"
 	"sync"
 
-	"github.com/aws/aws-sdk-go/aws/defaults"
+	"gopkg.in/olivere/elastic.v3"
+
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
-	"gopkg.in/topfreegames/elastic.v2"
 )
 
 var esclient *elastic.Client
@@ -38,12 +37,8 @@ func setConfigurationDefaults() {
 func configureESClient() {
 	logger.Logger.Debug(fmt.Sprintf("Connecting to elasticsearch @ %s",
 		viper.GetString("elasticsearch.host")))
-	credentials := defaults.CredChain(defaults.Config(), defaults.Handlers())
-	awsSigningRoundTripper := elastic.NewAWSSigningRoundTripper(nil, "us-east-1", credentials)
-	esHTTPClient := &http.Client{Transport: awsSigningRoundTripper}
 
 	client, err := elastic.NewClient(
-		elastic.SetHttpClient(esHTTPClient),
 		elastic.SetURL(viper.GetString("elasticsearch.host")),
 		elastic.SetSniff(viper.GetBool("elasticsearch.sniff")),
 	)

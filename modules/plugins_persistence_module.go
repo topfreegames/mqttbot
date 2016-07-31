@@ -5,11 +5,12 @@ import (
 	"reflect"
 	"time"
 
+	"gopkg.in/olivere/elastic.v3"
+
 	"github.com/layeh/gopher-luar"
 	"github.com/topfreegames/mqttbot/es"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/yuin/gopher-lua"
-	"gopkg.in/topfreegames/elastic.v2"
 )
 
 type Message struct {

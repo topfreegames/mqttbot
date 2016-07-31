@@ -14,7 +14,6 @@ import:
 - package: golang.org/x/crypto
   subpackages:
   - pbkdf2
-- package: gopkg.in/topfreegames/elastic.v2
 - package: github.com/franela/goblin
 - package: github.com/onsi/gomega
 - package: github.com/satori/go.uuid
