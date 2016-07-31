@@ -1,25 +1,8 @@
-hash: 2ee889e630bcc2db74fe85ff6b92da7e5f8c83b92c3a4b03a3379037eb5bbf86
-updated: 2016-07-21T13:49:01.394116242-03:00
+hash: a45afe911fd6b0ed44b13d3f5b5dfd12d99de97c0218653dd28c5a85265595c9
+updated: 2016-07-31T12:37:58.771730397-03:00
 imports:
 - name: github.com/ajg/form
   version: 7ff89c75808766205bfa4411abb436c98c33eb5e
-- name: github.com/aws/aws-sdk-go
-  version: d3b6d25135b4e09ecd39ea3c2a5cad35279b0515
-  subpackages:
-  - aws/defaults
-  - aws
-  - aws/credentials
-  - aws/request
-  - private/signer/v4
-  - aws/corehandlers
-  - aws/credentials/ec2rolecreds
-  - aws/ec2metadata
-  - private/endpoints
-  - aws/awserr
-  - aws/awsutil
-  - aws/client/metadata
-  - private/protocol/rest
-  - aws/client
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
 - name: github.com/cjoudrey/gluahttp
@@ -51,8 +34,6 @@ imports:
   version: 65b76a87bb28a3ca5d5c1b4443ee6b80db6399a9
 - name: github.com/gavv/monotime
   version: 259cd7b345f5aa080eff16f21d7866ef7dea9528
-- name: github.com/go-ini/ini
-  version: 72ba3e6b9e6b87e0c74c9a7a4dc86e8dd8ba4355
 - name: github.com/google/go-querystring
   version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
   subpackages:
@@ -97,8 +78,6 @@ imports:
   - html
 - name: github.com/iris-contrib/websocket
   version: 441a7ebf17ed34d57d7fedb2ceddc9f7e2ffd5cd
-- name: github.com/jmespath/go-jmespath
-  version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
 - name: github.com/kataras/iris
   version: 6b714522227a6477b937105a32cdfdf778f32811
   subpackages:
@@ -203,6 +182,11 @@ imports:
   version: 62bee037599929a6e9146f29d10dd5208c43507d
   subpackages:
   - unix
+- name: gopkg.in/olivere/elastic.v3
+  version: 787ebbb5a7600662bca364e4e8ca959f315e442f
+  subpackages:
+  - backoff
+  - uritemplates
 - name: gopkg.in/yaml.v2
   version: a83829b6f1293c91addabc89d0571c246397bbf4
 devImports: []
