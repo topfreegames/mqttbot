@@ -23,7 +23,7 @@ services:
     labels:
       - "local.example.description=Mosquitto v1.4.9 MQTT server"
   elasticsearch:
-    image: elasticsearch:1.7.5
+    image: elasticsearch:2.3.4
     ports:
       - "9123:9200"
       - "9300:9300"
