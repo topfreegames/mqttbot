@@ -42,6 +42,7 @@ func IndexMessage(L *lua.LState) int {
 	payload := L.Get(-1)
 	L.Pop(2)
 	message := Message{}
+	message.Timestamp = time.Now()
 	message.Payload = payload.String()
 	message.Topic = topic.String()
 	if _, err := esclient.Index().Index("chat").Type("message").BodyJson(message).Do(); err != nil {
