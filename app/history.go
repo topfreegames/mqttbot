@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
@@ -58,7 +59,9 @@ func HistoryHandler(app *App) func(c *iris.Context) {
 					messages = append(messages, t)
 				}
 			}
-			c.JSON(200, messages)
+			jsonMessages, _ := json.Marshal(messages)
+			c.Write(fmt.Sprintf("%s", jsonMessages))
+			c.SetContentType("application/json")
 			c.SetStatusCode(iris.StatusOK)
 		} else {
 			c.SetStatusCode(iris.StatusForbidden)
