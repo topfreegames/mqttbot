@@ -1,18 +1,18 @@
-hash: 44266b7c82a26ff0a325f86e36afd97a80c36969d5d47a44be9ca53a4ab70068
-updated: 2016-08-01T22:03:53.599171616-03:00
+hash: b6a3317b4094ab484159923a616306b2a64e2756527d9e10f3999de8322b96ea
+updated: 2016-08-02T00:28:12.748876557-03:00
 imports:
 - name: github.com/ajg/form
   version: 7ff89c75808766205bfa4411abb436c98c33eb5e
 - name: github.com/BurntSushi/toml
-  version: f0aeabca5a127c4078abb8c8d64298b147264b55
+  version: 99064174e013895bbd9b025c31100bd1d9b590ca
 - name: github.com/cjoudrey/gluahttp
-  version: 1128ce320b775e8e3fa2b8095b9c2116aa6869db
+  version: 9597a1d57575a0121726a2c50ad54fb74493a296
 - name: github.com/davecgh/go-spew
   version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
   subpackages:
   - spew
 - name: github.com/eclipse/paho.mqtt.golang
-  version: 45f9b18f4864c81d49c3ed01e5faec9eeb05de31
+  version: 44eec149d4433449add74781ffc86cc60d3f1598
   subpackages:
   - packets
 - name: github.com/fatih/structs
@@ -20,7 +20,7 @@ imports:
 - name: github.com/franela/goblin
   version: efa9910a3ea4ccb7ee4b977571318af2e51ba05f
 - name: github.com/fsnotify/fsnotify
-  version: 30411dbcefb7a1da7e84f75530ad3abe4011b4f8
+  version: a8a77c9133d2d6fd8334f3260d06f60e8d80a5fb
 - name: github.com/garyburd/redigo
   version: b8dc90050f24c1a73a52f107f3f575be67b21b7c
   subpackages:
@@ -31,15 +31,17 @@ imports:
   subpackages:
   - formatter
 - name: github.com/gavv/httpexpect
-  version: 65b76a87bb28a3ca5d5c1b4443ee6b80db6399a9
+  version: b5a77ac370dcc9bc2021de6e4144d364de272cba
 - name: github.com/gavv/monotime
   version: 259cd7b345f5aa080eff16f21d7866ef7dea9528
+- name: github.com/getsentry/raven-go
+  version: ba4db4fd041d16e10e08c4a402839775f863d401
 - name: github.com/google/go-querystring
   version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
   subpackages:
   - query
 - name: github.com/hashicorp/hcl
-  version: aa7699b7b62c5f410f4cf7b58f3f9b17a71fb4ad
+  version: d8c773c4cba11b11539e3d45f93daeaa5dcf1fa1
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -60,7 +62,9 @@ imports:
 - name: github.com/iris-contrib/errors
   version: 9d4599565f75fd376a8e4ae5ccc98fc078b93b69
 - name: github.com/iris-contrib/formBinder
-  version: 672da7dc0b798b54603604e52d031bb0faf3ea2a
+  version: 32009bbc76eda475a6d1eb24787d1fdcdaf80e71
+- name: github.com/iris-contrib/letsencrypt
+  version: 2a9ed749d24d8d2a8ece891b7b6242f0b3192d62
 - name: github.com/iris-contrib/logger
   version: 6a08b11d1faefa8ce79ed6d6efec9d2e05cbc549
 - name: github.com/iris-contrib/response
@@ -73,13 +77,13 @@ imports:
   - text
   - xml
 - name: github.com/iris-contrib/template
-  version: ba792978ce15a84fa82d27383c68e96925f2a83e
+  version: 1130d33ae375e4305f27f62f6793db587bcb6f83
   subpackages:
   - html
 - name: github.com/iris-contrib/websocket
-  version: 441a7ebf17ed34d57d7fedb2ceddc9f7e2ffd5cd
+  version: 2f1c3fd901de3359a6452a212c8be784f04b7073
 - name: github.com/kataras/iris
-  version: 6b714522227a6477b937105a32cdfdf778f32811
+  version: 922248bbf11a29c975655f2d75a16756cb052332
   subpackages:
   - iris
   - config
@@ -98,21 +102,23 @@ imports:
 - name: github.com/layeh/gopher-json
   version: e45b65570c08a97b97a459e0cc04a53c1affab95
 - name: github.com/layeh/gopher-luar
-  version: 0cfa37e7d7a39213dd0522d49293689742ba4478
+  version: 6fd801444c397a4112be511b24b191b898a69fcf
 - name: github.com/magiconair/properties
-  version: c265cfa48dda6474e208715ca93e987829f572f8
+  version: b3f6dd549956e8a61ea4a686a1c02a33d5bdda4b
 - name: github.com/mattn/go-colorable
-  version: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
+  version: ed8eb9e318d7a84ce5915b495b7d35e0cfe7b5a8
 - name: github.com/mattn/go-isatty
   version: 56b76bdf51f7708750eac80fa38b952bb9f32639
 - name: github.com/microcosm-cc/bluemonday
-  version: 4ac6f27528d0a3f2a59e0b0a6f6b3ff0bb89fe20
+  version: 9dc199233bf72cc1aad9b61f73daf2f0075b9ee4
+- name: github.com/miekg/dns
+  version: db96a2b759cdef4f11a34506a42eb8d1290c598e
 - name: github.com/mitchellh/mapstructure
-  version: d2dd0262208475919e1a362f675cfc0e7c10e905
+  version: 21a35fb16463dfb7c8eee579c65d995d95e64d1e
 - name: github.com/moul/http2curl
   version: b1479103caacaa39319f75e7f57fc545287fca0d
 - name: github.com/onsi/gomega
-  version: 9574b2d94c03faf63bf1b296e21d9db950006ea4
+  version: 9ed8da19f2156b87a803a8fdf6d126f627a12db1
 - name: github.com/op/go-logging
   version: 970db520ece77730c7e4724c61121037378659d9
 - name: github.com/pmezard/go-difflib
@@ -120,7 +126,7 @@ imports:
   subpackages:
   - difflib
 - name: github.com/russross/blackfriday
-  version: 1d6b8e9301e720b08a8938b8c25c018285885438
+  version: 93622da34e54fb6529bfb7c57e710f37a8d9cbd8
 - name: github.com/satori/go.uuid
   version: 0aa62d5ddceb50dbcb909d790b5345affd3669b6
 - name: github.com/sergi/go-diff
@@ -130,15 +136,15 @@ imports:
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cast
-  version: 27b586b42e29bec072fe7379259cc719e1289da6
+  version: e31f36ffc91a2ba9ddb72a4b6a607ff9b3d3cb63
 - name: github.com/spf13/cobra
-  version: bc81c21bd0d8be5ba2d6630a505d79d4467566e7
+  version: f62e98d28ab7ad31d707ba837a966378465c7b57
 - name: github.com/spf13/jwalterweatherman
   version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
 - name: github.com/spf13/pflag
-  version: 367864438f1b1a3c7db4da06a2f55b144e6784e0
+  version: 1560c1005499d61b80f865c04d39ca7505bf7f0b
 - name: github.com/spf13/viper
-  version: c1ccc378a054ea8d4e38d8c67f6938d4760b53dd
+  version: b53595fb56a492ecef90ee0457595a999eb6ec15
 - name: github.com/stretchr/testify
   version: d77da356e56a7428ad25149ca77381849a6a5232
   subpackages:
@@ -160,37 +166,52 @@ imports:
 - name: github.com/xeipuuv/gojsonreference
   version: e02fc20de94c78484cd5ffb007f8af96be030a45
 - name: github.com/xeipuuv/gojsonschema
-  version: 66a3de92def23708184148ae337750915875e7c1
+  version: 0a98b2bd93655a563d1f23c4407e8f01791b6b31
+- name: github.com/xenolf/lego
+  version: 4c33bee13d438d72ea22be3ff806f8093fb8d072
+  subpackages:
+  - acme
 - name: github.com/yalp/jsonpath
   version: 31a79c7593bb93eb10b163650d4a3e6ca190e4dc
 - name: github.com/yudai/golcs
   version: d1c525dea8ce39ea9a783d33cf08932305373f2c
 - name: github.com/yuin/gopher-lua
-  version: 47f0f792b296190027f38d577f0860e2dad7a777
+  version: e57b64049898d04ad03d3cc75ffa770eb29aeae0
   subpackages:
   - ast
   - parse
   - pm
 - name: golang.org/x/crypto
-  version: f3241ce8505855877cc8a9717bd61a0f7c4ea83c
+  version: bc89c496413265e715159bdc8478ee9a92fdc265
   subpackages:
   - pbkdf2
+  - ocsp
 - name: golang.org/x/net
-  version: d7bf3545bb0dacf009c535b3d3fbf53ac0a339ab
+  version: 28d1bd4fbe7e56c9025ffe3a89113fa4f5e48f31
   subpackages:
   - publicsuffix
   - websocket
+  - context
   - html
   - html/atom
 - name: golang.org/x/sys
-  version: 62bee037599929a6e9146f29d10dd5208c43507d
+  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
   subpackages:
   - unix
+- name: golang.org/x/time
+  version: a4bde12657593d5e90d0533a3e4fd95e635124cb
+  subpackages:
+  - rate
 - name: gopkg.in/olivere/elastic.v3
   version: 787ebbb5a7600662bca364e4e8ca959f315e442f
   subpackages:
   - backoff
   - uritemplates
+- name: gopkg.in/square/go-jose.v1
+  version: e3f973b66b91445ec816dd7411ad1b6495a5a2fc
+  subpackages:
+  - cipher
+  - json
 - name: gopkg.in/yaml.v2
-  version: a83829b6f1293c91addabc89d0571c246397bbf4
+  version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
 devImports: []
