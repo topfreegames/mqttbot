@@ -1,5 +1,5 @@
-hash: a45afe911fd6b0ed44b13d3f5b5dfd12d99de97c0218653dd28c5a85265595c9
-updated: 2016-07-31T12:37:58.771730397-03:00
+hash: 44266b7c82a26ff0a325f86e36afd97a80c36969d5d47a44be9ca53a4ab70068
+updated: 2016-08-01T22:03:53.599171616-03:00
 imports:
 - name: github.com/ajg/form
   version: 7ff89c75808766205bfa4411abb436c98c33eb5e
@@ -144,6 +144,10 @@ imports:
   subpackages:
   - assert
   - require
+- name: github.com/uber-go/atomic
+  version: 0c9e689d64f004564b79d9a663634756df322902
+- name: github.com/uber-go/zap
+  version: 67b225f77ee44903f50fb09ef21910c879c77222
 - name: github.com/valyala/bytebufferpool
   version: 8ebd0474e5a2f0a5c7a74ad2bf421a1d1a90264f
 - name: github.com/valyala/fasthttp

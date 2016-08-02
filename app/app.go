@@ -10,11 +10,13 @@ package app
 import (
 	"fmt"
 
+	"github.com/getsentry/raven-go"
 	"github.com/kataras/iris"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/bot"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/redisclient"
+	"github.com/uber-go/zap"
 )
 
 // App is the struct that defines the application
@@ -44,6 +46,7 @@ func GetApp(host string, port int, debug bool) *App {
 // Configure configures the application
 func (app *App) Configure() {
 	app.setConfigurationDefaults()
+	app.configureSentry()
 	app.loadConfiguration()
 	app.configureApplication()
 }
@@ -62,15 +65,37 @@ func (app *App) loadConfiguration() {
 	}
 }
 
+func (app *App) configureSentry() {
+	sentryURL := viper.GetString("sentry.url")
+	logger.Logger.Info(fmt.Sprintf("Configuring sentry with URL %s", sentryURL))
+	raven.SetDSN(sentryURL)
+}
+
 func (app *App) configureApplication() {
 	app.MqttBot = bot.GetMqttBot()
 	app.Api = iris.New()
 	a := app.Api
-
+	a.Use(NewLoggerMiddleware(zap.New(
+		zap.NewJSONEncoder(),
+	)))
+	a.Use(&SentryMiddleware{App: app})
+	a.Use(&VersionMiddleware{App: app})
+	a.Use(&RecoveryMiddleware{OnError: app.onErrorHandler})
 	a.Get("/healthcheck", HealthCheckHandler(app))
 	a.Get("/history/*topic", HistoryHandler(app))
 
 	app.RedisClient = redisclient.GetRedisClient(viper.GetString("redis.host"), viper.GetInt("redis.port"), viper.GetString("redis.password"))
+}
+
+func (app *App) onErrorHandler(err error, stack []byte) {
+	logger.Logger.Errorf(
+		"Panic occurred. stack: %s", string(stack),
+	)
+	tags := map[string]string{
+		"source": "app",
+		"type":   "panic",
+	}
+	raven.CaptureError(err, tags)
 }
 
 // Start starts the application

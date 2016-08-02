@@ -39,7 +39,7 @@ func HistoryHandler(app *App) func(c *iris.Context) {
 		r, err := rc.Do("EXEC")
 		if err != nil {
 			logger.Logger.Error(err.Error())
-			c.SetStatusCode(iris.StatusInternalServerError)
+			c.Error(err.Error(), iris.StatusInternalServerError)
 			return
 		}
 		redisResults := (r.([]interface{}))
@@ -49,7 +49,7 @@ func HistoryHandler(app *App) func(c *iris.Context) {
 				Sort("timestamp", false).From(from).Size(limit).Do()
 			if err != nil {
 				logger.Logger.Error(err.Error())
-				c.SetStatusCode(iris.StatusInternalServerError)
+				c.Error(err.Error(), iris.StatusInternalServerError)
 				return
 			}
 			messages := []Message{}
