@@ -35,7 +35,9 @@ If you want to run the application locally you can do so by running
 
 `
 make setup
+
 make build
+
 make run
 `
 
@@ -50,4 +52,4 @@ The project is integrated with Travis CI and uses docker to run the needed servi
 If you are interested in running the tests yourself you will need docker (version 1.10
 and up) and docker-compose.
 
-To run the tests simply run `make run-tests`
+To run the tests simply run `make test`
