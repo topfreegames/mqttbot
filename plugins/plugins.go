@@ -2,9 +2,11 @@ package plugins
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/cjoudrey/gluahttp"
+	"github.com/getsentry/raven-go"
 	"github.com/layeh/gopher-json"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
@@ -50,6 +52,14 @@ func (p *Plugins) loadModules(L *lua.LState) {
 	L.PreloadModule("password", modules.PasswordModuleLoader)
 }
 
+func reportError(err error) {
+	tags := map[string]string{
+		"source": "app",
+		"type":   "Lua plugin execution error",
+	}
+	raven.CaptureError(err, tags)
+}
+
 // ExecutePlugin calls the proper plugin with the parameters
 func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (success int, err error) {
 	L := lua.NewState()
@@ -63,6 +73,7 @@ func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (success int, err
 		Protect: true,
 	}, lua.LString(topic), lua.LString(payload)); err != nil {
 		logger.Logger.Error(err)
+		reportError(err)
 		return 1, err
 	}
 	ret := L.Get(-1)
@@ -70,6 +81,7 @@ func (p *Plugins) ExecutePlugin(payload, topic, plugin string) (success int, err
 	L.Pop(2)
 	if retErr != nil && retErr != lua.LNil {
 		logger.Logger.Error(retErr.String())
+		reportError(fmt.Errorf("%s", retErr.String()))
 		return 1, errors.New(retErr.String())
 	}
 	return int(ret.(lua.LNumber)), nil
