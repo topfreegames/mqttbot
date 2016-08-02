@@ -40,4 +40,25 @@ run:
 deps:
 	@glide install
 
+cross: cross-linux cross-darwin
+
+cross-linux:
+	@mkdir -p ./bin
+	@echo "Building for linux-i386..."
+	@env GOOS=linux GOARCH=386 go build -o ./bin/mqttbot-linux-i386 ./main.go
+	@echo "Building for linux-x86_64..."
+	@env GOOS=linux GOARCH=amd64 go build -o ./bin/mqttbot-linux-x86_64 ./main.go
+	@$(MAKE) cross-exec
+
+cross-darwin:
+	@mkdir -p ./bin
+	@echo "Building for darwin-i386..."
+	@env GOOS=darwin GOARCH=386 go build -o ./bin/mqttbot-darwin-i386 ./main.go
+	@echo "Building for darwin-x86_64..."
+	@env GOOS=darwin GOARCH=amd64 go build -o ./bin/mqttbot-darwin-x86_64 ./main.go
+	@$(MAKE) cross-exec
+
+cross-exec:
+	@chmod +x bin/*
+
 default: @build
