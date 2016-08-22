@@ -2,8 +2,6 @@ FROM golang:1.6.2-alpine
 
 MAINTAINER TFG Co <backend@tfgco.com>
 
-EXPOSE 8080
-
 RUN apk update
 RUN apk add git bash
 
@@ -28,5 +26,7 @@ ENV MQTTBOT_REDIS_PORT 6379
 ENV MQTTBOT_API_TLS false
 ENV MQTTBOT_API_CERTFILE ./misc/example.crt
 ENV MQTTBOT_API_KEYFILE ./misc/example.key
+
+EXPOSE 5000
 
 CMD ./start_docker.sh
