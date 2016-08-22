@@ -5,7 +5,7 @@ MAINTAINER TFG Co <backend@tfgco.com>
 EXPOSE 8080
 
 RUN apk update
-RUN apk add git
+RUN apk add git bash
 
 RUN go get -u github.com/Masterminds/glide/...
 
