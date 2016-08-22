@@ -2,8 +2,8 @@ FROM golang:1.6.2-alpine
 
 MAINTAINER TFG Co <backend@tfgco.com>
 
-EXPOSE 80
-EXPOSE 443
+EXPOSE 8080
+EXPOSE 4443
 
 RUN apk update
 RUN apk add git
