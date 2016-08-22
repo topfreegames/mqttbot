@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  redis:
+    image: redis:3.2
+    command: redis-server
+  elasticsearch:
+    image: elasticsearch:2.3.4
+  mosquitto:
+    image: tfgco/mosquitto_with_auth:0.0.1
+    environment:
+      - REDIS_PASS=nopass
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+  mqttbot:
+    build:
+      context: ./
+    environment:
+      - MQTTBOT_MQTTSERVER_HOST=mosquitto
+      - MQTTBOT_MQTTSERVER_PORT=1883
+      - MQTTBOT_ELASTICSEARCH_HOST=http://elasticsearch:9200
+      - MQTTBOT_REDIS_HOST=redis
+    ports:
+      - "8888:80"
+      - "8883:443"
+    depends_on:
+      - redis
+      - mosquitto
+      - elasticsearch

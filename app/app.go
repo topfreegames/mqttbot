@@ -101,7 +101,7 @@ func (app *App) onErrorHandler(err error, stack []byte) {
 // Start starts the application
 func (app *App) Start() {
 	if viper.GetBool("api.tls") {
-		logger.Logger.Info("Api listening using TLS!")
+		logger.Logger.Infof("Api listening using TLS! Certfile: %s, Keyfile: %s", viper.GetString("api.certFile"), viper.GetString("api.keyFile"))
 		app.Api.ListenTLS(fmt.Sprintf("%s:%d", app.Host, app.Port), viper.GetString("api.certFile"), viper.GetString("api.keyFile"))
 	} else {
 		app.Api.Listen(fmt.Sprintf("%s:%d", app.Host, app.Port))

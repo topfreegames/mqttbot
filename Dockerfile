@@ -2,7 +2,8 @@ FROM golang:1.6.2-alpine
 
 MAINTAINER TFG Co <backend@tfgco.com>
 
-EXPOSE 8080
+EXPOSE 80
+EXPOSE 443
 
 RUN apk update
 RUN apk add git
@@ -25,5 +26,8 @@ ENV MQTTBOT_ELASTICSEARCH_SNIFF false
 
 ENV MQTTBOT_REDIS_HOST localhost
 ENV MQTTBOT_REDIS_PORT 6379
+ENV MQTTBOT_API_TLS false
+ENV MQTTBOT_API_CERTFILE ./misc/example.crt
+ENV MQTTBOT_API_KEYFILE ./misc/example.key
 
-CMD /go/bin/mqttbot start --bind 0.0.0.0 --port 8080 --config /go/src/github.com/topfreegames/mqttbot/config/local.yaml
+CMD ./start_docker.sh
