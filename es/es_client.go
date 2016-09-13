@@ -53,7 +53,8 @@ func configureESClient() {
 	for index, mappings := range indexes {
 		_, err = client.CreateIndex(index).Body(mappings).Do()
 		if err != nil {
-			if strings.Contains(err.Error(), "index_already_exists_exception") || strings.Contains(err.Error(), "IndexAlreadyExistsException") {
+			if strings.Contains(err.Error(), "index_already_exists_exception") || strings.Contains(err.Error(), "IndexAlreadyExistsException" ||
+				strings.Contains(err.Error(), "already exists as alias")) {
 				logger.Logger.Warning(fmt.Sprintf("Index %s already exists into ES! Ignoring creation...", index))
 			} else {
 				logger.Logger.Error(fmt.Sprintf("Failed to create index %s into ES, err: %s", index, err))
