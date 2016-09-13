@@ -1,3 +1,3 @@
 package app
 
-var VERSION = "1.0.2"
+var VERSION = "2.0.0"
