@@ -22,7 +22,7 @@ kill-containers:
 	@cd test_containers && docker-compose stop && cd ..
 
 run-tests: run-containers
-	@sleep 5 #wait for es to start
+	@sleep 5
 	@make coverage
 	@make kill-containers
 

@@ -63,7 +63,7 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 			jsonMessages, _ := json.Marshal(messages)
 			return c.JSON(http.StatusOK, jsonMessages)
 		} else {
-			return echo.ErrUnauthorized
+			return c.String(echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message)
 		}
 	}
 }
