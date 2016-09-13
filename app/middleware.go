@@ -6,42 +6,49 @@ import (
 	"time"
 
 	"github.com/getsentry/raven-go"
-	"github.com/kataras/iris"
+	"github.com/labstack/echo"
 	"github.com/uber-go/zap"
 )
 
 //VersionMiddleware automatically adds a version header to response
-type VersionMiddleware struct {
-	App *App
+func VersionMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Response().Header().Set(echo.HeaderServer, fmt.Sprintf("mqttbot/v%s", VERSION))
+		return next(c)
+	}
 }
 
-// Serve automatically adds a version header to response
-func (m *VersionMiddleware) Serve(c *iris.Context) {
-	c.SetHeader("MQTTBOT-VERSION", VERSION)
-	c.Next()
+//NewRecoveryMiddleware returns a configured middleware
+func NewRecoveryMiddleware(onError func(interface{}, []byte)) *RecoveryMiddleware {
+	return &RecoveryMiddleware{
+		OnError: onError,
+	}
 }
 
-//RecoveryMiddleware recovers from errors in Iris
+//RecoveryMiddleware recovers from errors in Echo
 type RecoveryMiddleware struct {
-	OnError func(error, []byte)
+	OnError func(interface{}, []byte)
 }
 
 //Serve executes on error handler when errors happen
-func (r RecoveryMiddleware) Serve(ctx *iris.Context) {
-	defer func() {
-		if err := recover(); err != nil {
-			if r.OnError != nil {
-				switch err.(type) {
-				case error:
-					r.OnError(err.(error), debug.Stack())
-				default:
-					r.OnError(fmt.Errorf("%v", err), debug.Stack())
+func (r RecoveryMiddleware) Serve(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		defer func() {
+			if err := recover(); err != nil {
+				if r.OnError != nil {
+					r.OnError(err, debug.Stack())
+				}
+
+				if eError, ok := err.(error); ok {
+					c.Error(eError)
+				} else {
+					eError = fmt.Errorf(fmt.Sprintf("%v", err))
+					c.Error(eError)
 				}
 			}
-			ctx.Panic()
-		}
-	}()
-	ctx.Next()
+		}()
+		return next(c)
+	}
 }
 
 //LoggerMiddleware is responsible for logging to Zap all requests
@@ -50,60 +57,69 @@ type LoggerMiddleware struct {
 }
 
 // Serve serves the middleware
-func (l *LoggerMiddleware) Serve(ctx *iris.Context) {
-	log := l.Logger.With(
-		zap.String("source", "request"),
-	)
+func (l LoggerMiddleware) Serve(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		log := l.Logger.With(
+			zap.String("source", "request"),
+		)
 
-	//all except latency to string
-	var ip, method, path string
-	var status int
-	var latency time.Duration
-	var startTime, endTime time.Time
+		//all except latency to string
+		var ip, method, path string
+		var status int
+		var latency time.Duration
+		var startTime, endTime time.Time
 
-	path = ctx.PathString()
-	method = ctx.MethodString()
+		path = c.Path()
+		method = c.Request().Method()
 
-	startTime = time.Now()
+		startTime = time.Now()
 
-	ctx.Next()
+		result := next(c)
 
-	//no time.Since in order to format it well after
-	endTime = time.Now()
-	latency = endTime.Sub(startTime)
+		//no time.Since in order to format it well after
+		endTime = time.Now()
+		latency = endTime.Sub(startTime)
 
-	status = ctx.Response.StatusCode()
-	ip = ctx.RemoteAddr()
+		status = c.Response().Status()
+		ip = c.Request().RemoteAddress()
 
-	reqLog := log.With(
-		zap.Time("endTime", endTime),
-		zap.Int("statusCode", status),
-		zap.Duration("latency", latency),
-		zap.String("ip", ip),
-		zap.String("method", method),
-		zap.String("path", path),
-	)
+		route := c.Get("route")
+		if route == nil {
+			log.Debug("Route does not have route set in ctx")
+			return result
+		}
 
-	//request failed
-	if status > 399 && status < 500 {
-		reqLog.Warn("Request failed.")
-		return
+		reqLog := log.With(
+			zap.String("route", route.(string)),
+			zap.Time("endTime", endTime),
+			zap.Int("statusCode", status),
+			zap.Duration("latency", latency),
+			zap.String("ip", ip),
+			zap.String("method", method),
+			zap.String("path", path),
+		)
+
+		//request failed
+		if status > 399 && status < 500 {
+			reqLog.Warn("Request failed.")
+			return result
+		}
+
+		//request is ok, but server failed
+		if status > 499 {
+			reqLog.Error("Response failed.")
+			return result
+		}
+		//Everything went ok
+		reqLog.Info("Request successful.")
+		return result
 	}
-
-	//request is ok, but server failed
-	if status > 499 {
-		reqLog.Error("Response failed.")
-		return
-	}
-
-	//Everything went ok
-	reqLog.Info("Request successful.")
 }
 
 // NewLoggerMiddleware returns the logger middleware
-func NewLoggerMiddleware(theLogger zap.Logger) iris.HandlerFunc {
+func NewLoggerMiddleware(theLogger zap.Logger) *LoggerMiddleware {
 	l := &LoggerMiddleware{Logger: theLogger}
-	return l.Serve
+	return l
 }
 
 //SentryMiddleware is responsible for sending all exceptions to sentry
@@ -112,15 +128,25 @@ type SentryMiddleware struct {
 }
 
 // Serve serves the middleware
-func (l *SentryMiddleware) Serve(ctx *iris.Context) {
-	ctx.Next()
-
-	if ctx.Response.StatusCode() > 499 {
-		tags := map[string]string{
-			"source": "app",
-			"type":   "Internal server error",
-			"url":    ctx.Request.URI().String(),
+func (s SentryMiddleware) Serve(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		err := next(c)
+		if err != nil {
+			tags := map[string]string{
+				"source": "app",
+				"type":   "Internal server error",
+				"url":    c.Request().URI(),
+				"status": fmt.Sprintf("%d", c.Response().Status()),
+			}
+			raven.CaptureError(err, tags)
 		}
-		raven.CaptureError(fmt.Errorf("%s", string(ctx.Response.Body())), tags)
+		return err
+	}
+}
+
+//NewSentryMiddleware returns a new sentry middleware
+func NewSentryMiddleware(app *App) *SentryMiddleware {
+	return &SentryMiddleware{
+		App: app,
 	}
 }

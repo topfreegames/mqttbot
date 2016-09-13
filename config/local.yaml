@@ -1,8 +1,4 @@
 ---
-api:
-  tls: false
-  certFile: ./misc/example.crt
-  keyFile: ./misc/example.key
 healthcheck:
   workingText: "WORKING"
 mqttserver:

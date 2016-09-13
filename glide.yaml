@@ -19,11 +19,10 @@ import:
 - package: github.com/satori/go.uuid
 - package: github.com/gavv/httpexpect
 - package: github.com/ajg/form
-- package: github.com/kataras/iris
-  subpackages:
-  - iris
 - package: github.com/valyala/fasthttp
 - package: gopkg.in/olivere/elastic.v3
 - package: github.com/uber-go/zap
 - package: github.com/uber-go/atomic
 - package: github.com/getsentry/raven-go
+- package: github.com/labstack/echo
+  version: ^2.0.2

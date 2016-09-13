@@ -1,15 +1,17 @@
 package app
 
 import (
-	"github.com/kataras/iris"
+	"net/http"
+
+	"github.com/labstack/echo"
 	"github.com/spf13/viper"
 )
 
 //HealthCheckHandler is the handler responsible for validating that the app is still up
-func HealthCheckHandler(app *App) func(c *iris.Context) {
-	return func(c *iris.Context) {
+func HealthCheckHandler(app *App) func(c echo.Context) error {
+	return func(c echo.Context) error {
+		c.Set("route", "Healthcheck")
 		workingString := viper.GetString("healthcheck.workingText")
-		c.SetStatusCode(iris.StatusOK)
-		c.Write(workingString)
+		return c.String(http.StatusOK, workingString)
 	}
 }

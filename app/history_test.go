@@ -4,7 +4,7 @@
 // http://www.opensource.org/licenses/mit-license
 // Copyright © 2016 Top Free Games <backend@tfgco.com>
 
-package app
+package app_test
 
 import (
 	"net/http"
@@ -13,8 +13,10 @@ import (
 
 	. "github.com/franela/goblin"
 	. "github.com/onsi/gomega"
+	. "github.com/topfreegames/mqttbot/app"
 	"github.com/topfreegames/mqttbot/es"
 	"github.com/topfreegames/mqttbot/redisclient"
+	. "github.com/topfreegames/mqttbot/testing"
 )
 
 func TestHistoryHandler(t *testing.T) {
@@ -24,10 +26,10 @@ func TestHistoryHandler(t *testing.T) {
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
 	g.Describe("History Handler", func() {
-		g.It("It should return 404 if the user is not authorized into the topic", func() {
+		g.It("It should return 401 if the user is not authorized into the topic", func() {
 			a := GetDefaultTestApp()
-			res := Get(a, "/history/chat/teste?userid=test:teste", t)
-			g.Assert(res.Raw().StatusCode).Equal(http.StatusForbidden)
+			status, _ := Get(a, "/history/chat/teste?userid=test:teste2", t)
+			g.Assert(status).Equal(http.StatusUnauthorized)
 		})
 
 		g.It("It should return 200 if the user is authorized into the topic", func() {
@@ -45,8 +47,8 @@ func TestHistoryHandler(t *testing.T) {
 			}
 			_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do()
 			Expect(err).To(BeNil())
-			res := GetWithQuery(a, "/history/chat/teste", "userid", "test:teste", t)
-			g.Assert(res.Raw().StatusCode).Equal(http.StatusOK)
+			status, _ := Get(a, "/history/chat/teste?userid=test:teste", t)
+			g.Assert(status).Equal(http.StatusOK)
 		})
 	})
 }

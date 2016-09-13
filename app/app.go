@@ -9,9 +9,12 @@ package app
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/getsentry/raven-go"
-	"github.com/kataras/iris"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/engine"
+	"github.com/labstack/echo/engine/standard"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/bot"
 	"github.com/topfreegames/mqttbot/logger"
@@ -24,7 +27,8 @@ type App struct {
 	Debug       bool
 	Port        int
 	Host        string
-	Api         *iris.Framework
+	Api         *echo.Echo
+	Engine      engine.Server
 	MqttBot     *bot.MqttBot
 	RedisClient *redisclient.RedisClient
 }
@@ -61,7 +65,7 @@ func (app *App) loadConfiguration() {
 	if err := viper.ReadInConfig(); err == nil {
 		logger.Logger.Debug("Config file read successfully")
 	} else {
-		panic(fmt.Sprintf("Could not load configuration file"))
+		panic(fmt.Sprintf("Could not load configuration file, err: %s", err))
 	}
 }
 
@@ -73,37 +77,44 @@ func (app *App) configureSentry() {
 
 func (app *App) configureApplication() {
 	app.MqttBot = bot.GetMqttBot()
-	app.Api = iris.New()
+	app.Engine = standard.New(fmt.Sprintf("%s:%d", app.Host, app.Port))
+	app.Api = echo.New()
 	a := app.Api
+	_, w, _ := os.Pipe()
+	a.SetLogOutput(w)
 	a.Use(NewLoggerMiddleware(zap.New(
 		zap.NewJSONEncoder(),
-	)))
-	a.Use(&SentryMiddleware{App: app})
-	a.Use(&VersionMiddleware{App: app})
-	a.Use(&RecoveryMiddleware{OnError: app.onErrorHandler})
+	)).Serve)
+	a.Use(NewSentryMiddleware(app).Serve)
+	a.Use(VersionMiddleware)
+	a.Use(NewRecoveryMiddleware(app.OnErrorHandler).Serve)
 	a.Get("/healthcheck", HealthCheckHandler(app))
-	a.Get("/history/*topic", HistoryHandler(app))
+	a.Get("/history/*", HistoryHandler(app))
+	a.Get("/:other", NotFoundHandler(app))
 
 	app.RedisClient = redisclient.GetRedisClient(viper.GetString("redis.host"), viper.GetInt("redis.port"), viper.GetString("redis.password"))
 }
 
-func (app *App) onErrorHandler(err error, stack []byte) {
-	logger.Logger.Errorf(
-		"Panic occurred. stack: %s", string(stack),
-	)
+//OnErrorHandler handles application panics
+func (app *App) OnErrorHandler(err interface{}, stack []byte) {
+	logger.Logger.Error(err)
+
+	var e error
+	switch err.(type) {
+	case error:
+		e = err.(error)
+	default:
+		e = fmt.Errorf("%v", err)
+	}
+
 	tags := map[string]string{
 		"source": "app",
 		"type":   "panic",
 	}
-	raven.CaptureError(err, tags)
+	raven.CaptureError(e, tags)
 }
 
 // Start starts the application
 func (app *App) Start() {
-	if viper.GetBool("api.tls") {
-		logger.Logger.Infof("Api listening using TLS! Certfile: %s, Keyfile: %s", viper.GetString("api.certFile"), viper.GetString("api.keyFile"))
-		app.Api.ListenTLS(fmt.Sprintf("%s:%d", app.Host, app.Port), viper.GetString("api.certFile"), viper.GetString("api.keyFile"))
-	} else {
-		app.Api.Listen(fmt.Sprintf("%s:%d", app.Host, app.Port))
-	}
+	app.Api.Run(app.Engine)
 }

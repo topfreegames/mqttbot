@@ -3,12 +3,14 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"reflect"
+	"strconv"
 	"time"
 
 	"gopkg.in/olivere/elastic.v3"
 
-	"github.com/kataras/iris"
+	"github.com/labstack/echo"
 	"github.com/topfreegames/mqttbot/es"
 	"github.com/topfreegames/mqttbot/logger"
 )
@@ -20,16 +22,19 @@ type Message struct {
 }
 
 // HistoryHandler is the handler responsible for sending the rooms history to the player
-func HistoryHandler(app *App) func(c *iris.Context) {
-	return func(c *iris.Context) {
+func HistoryHandler(app *App) func(c echo.Context) error {
+	return func(c echo.Context) error {
 		esclient := es.GetESClient()
-		topic := c.Param("topic")[1:len(c.Param("topic"))]
-		userId := c.URLParam("userid")
-		from, _ := c.URLParamInt("from")
-		limit, _ := c.URLParamInt("limit")
+		c.Set("route", "History")
+		topic := c.ParamValues()[0]
+		userId := c.QueryParam("userid")
+		from, err := strconv.Atoi(c.QueryParam("from"))
+		limit, err := strconv.Atoi(c.QueryParam("limit"))
+
 		if limit == 0 {
 			limit = 10
 		}
+
 		logger.Logger.Debugf("user %s is asking for history for topic %s with args from=%d and limit=%d", userId, topic, from, limit)
 		rc := app.RedisClient.Pool.Get()
 		defer rc.Close()
@@ -38,9 +43,7 @@ func HistoryHandler(app *App) func(c *iris.Context) {
 		rc.Send("GET", fmt.Sprintf("%s-%s", userId, topic))
 		r, err := rc.Do("EXEC")
 		if err != nil {
-			logger.Logger.Error(err.Error())
-			c.Error(err.Error(), iris.StatusInternalServerError)
-			return
+			return err
 		}
 		redisResults := (r.([]interface{}))
 		if redisResults[0] != nil && redisResults[1] != nil {
@@ -48,9 +51,7 @@ func HistoryHandler(app *App) func(c *iris.Context) {
 			searchResults, err := esclient.Search().Index("chat").Query(termQuery).
 				Sort("timestamp", false).From(from).Size(limit).Do()
 			if err != nil {
-				logger.Logger.Error(err.Error())
-				c.Error(err.Error(), iris.StatusInternalServerError)
-				return
+				return err
 			}
 			messages := []Message{}
 			var ttyp Message
@@ -60,12 +61,9 @@ func HistoryHandler(app *App) func(c *iris.Context) {
 				}
 			}
 			jsonMessages, _ := json.Marshal(messages)
-			c.Write(fmt.Sprintf("%s", jsonMessages))
-			c.SetContentType("application/json")
-			c.SetStatusCode(iris.StatusOK)
+			return c.JSON(http.StatusOK, jsonMessages)
 		} else {
-			c.SetStatusCode(iris.StatusForbidden)
-			return
+			return echo.ErrUnauthorized
 		}
 	}
 }
