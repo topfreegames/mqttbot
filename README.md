@@ -33,13 +33,10 @@ and a mosquitto server (auth plugin (jpmens/mosquitto-auth-plug) is supported).
 
 If you want to run the application locally you can do so by running
 
-`
+```
 make setup
-
-make build
-
 make run
-`
+```
 
 You may need to change the configurations to point to your MQTT, ElasticSearch
 and Redis servers, or you can use the provided containers, they can be run
