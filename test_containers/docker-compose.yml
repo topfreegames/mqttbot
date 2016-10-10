@@ -9,8 +9,6 @@ services:
       - mosqnet
   mosquitto:
     image: jllopis/mosquitto:v1.4.9
-    volumes:
-      - ${PWD}/data:/etc/mosquitto.d
     ports:
       - "1883:1883"
     environment:
@@ -23,9 +21,10 @@ services:
     labels:
       - "local.example.description=Mosquitto v1.4.9 MQTT server"
   elasticsearch:
-    image: elasticsearch:2.3.4
+    image: elasticsearch:2.4
     ports:
       - "9123:9200"
       - "9300:9300"
+    command: "elasticsearch -Des.logger.level=DEBUG"
 networks:
   mosqnet:

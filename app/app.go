@@ -27,7 +27,7 @@ type App struct {
 	Debug       bool
 	Port        int
 	Host        string
-	Api         *echo.Echo
+	API         *echo.Echo
 	Engine      engine.Server
 	MqttBot     *bot.MqttBot
 	RedisClient *redisclient.RedisClient
@@ -78,8 +78,8 @@ func (app *App) configureSentry() {
 func (app *App) configureApplication() {
 	app.MqttBot = bot.GetMqttBot()
 	app.Engine = standard.New(fmt.Sprintf("%s:%d", app.Host, app.Port))
-	app.Api = echo.New()
-	a := app.Api
+	app.API = echo.New()
+	a := app.API
 	_, w, _ := os.Pipe()
 	a.SetLogOutput(w)
 	a.Use(NewLoggerMiddleware(zap.New(
@@ -89,6 +89,7 @@ func (app *App) configureApplication() {
 	a.Use(VersionMiddleware)
 	a.Use(NewRecoveryMiddleware(app.OnErrorHandler).Serve)
 	a.Get("/healthcheck", HealthCheckHandler(app))
+	a.Get("/historysince/*", HistorySinceHandler(app))
 	a.Get("/history/*", HistoryHandler(app))
 	a.Get("/:other", NotFoundHandler(app))
 
@@ -116,5 +117,5 @@ func (app *App) OnErrorHandler(err interface{}, stack []byte) {
 
 // Start starts the application
 func (app *App) Start() {
-	app.Api.Run(app.Engine)
+	app.API.Run(app.Engine)
 }

@@ -22,12 +22,14 @@ import (
 	"github.com/topfreegames/mqttbot/app"
 )
 
+// GetDefaultTestApp retrieve a default app for testing purposes
 func GetDefaultTestApp() *app.App {
 	viper.SetConfigFile("../config/test.yaml")
 	app := app.GetApp("0.0.0.0", 8888, true)
 	return app
 }
 
+// Get implements the GET http verb for testing purposes
 func Get(app *app.App, url string, t *testing.T) (int, string) {
 	return doRequest(app, "GET", url, "")
 }
@@ -54,7 +56,7 @@ func GetWithQuery(app *App, url string, queryKey string, queryValue string, t *t
 */
 
 func doRequest(app *app.App, method, url, body string) (int, string) {
-	app.Engine.SetHandler(app.Api)
+	app.Engine.SetHandler(app.API)
 	ts := httptest.NewServer(app.Engine.(*standard.Server))
 	defer ts.Close()
 
