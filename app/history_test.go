@@ -166,7 +166,7 @@ func TestHistoryHandler(t *testing.T) {
 				}
 			})
 
-			g.It("It should return 200 if the user is authorized into the topic", func() {
+			g.It("Should retrieve 10 messages when limit is 10 and the history size is greater than this", func() {
 				a := GetDefaultTestApp()
 				testId := strings.Replace(uuid.NewV4().String(), "-", "", -1)
 				topic := fmt.Sprintf("chat/test_%s", testId)
@@ -214,7 +214,7 @@ func TestHistoryHandler(t *testing.T) {
 			})
 		})
 
-		g.It("It should return 200 if the user is authorized into the topic", func() {
+		g.It("Should retrieve all messages eve if limit is greater than the size of current history", func() {
 			a := GetDefaultTestApp()
 			testId := strings.Replace(uuid.NewV4().String(), "-", "", -1)
 			topic := fmt.Sprintf("chat/test_%s", testId)
@@ -262,7 +262,7 @@ func TestHistoryHandler(t *testing.T) {
 			}
 		})
 
-		g.It("It should return 200 if the user is authorized into the topic", func() {
+		g.It("Should retrieve 1 message from history when limit is 1 and theres more than 1 message", func() {
 			a := GetDefaultTestApp()
 			testId := strings.Replace(uuid.NewV4().String(), "-", "", -1)
 			topic := fmt.Sprintf("chat/test_%s", testId)
