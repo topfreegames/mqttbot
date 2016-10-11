@@ -14,6 +14,11 @@ mqttserver:
       plugins:
         - plugin: "persist_message"
           messagePattern: ".*"
+    - topic: 'chat/+/room/+/donations'
+      qos: 2
+      plugins:
+        - plugin: "persist_message"
+          messagePattern: ".*"
     - topic: 'mqttbot/history/#'
       qos: 2
       plugins:
