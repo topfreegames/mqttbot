@@ -15,6 +15,7 @@ before_script:
   - make run-containers
   - sleep 15
   - curl http://localhost:9123
+  - make create-es-index-template
 
 script:
   - make coverage

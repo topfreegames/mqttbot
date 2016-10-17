@@ -8,7 +8,6 @@
 package app
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -21,51 +20,12 @@ import (
 	"github.com/onsi/gomega"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/app"
-	"github.com/topfreegames/mqttbot/es"
 )
-
-func createIndexTemplate() {
-	client := &http.Client{}
-	indexTemplateMap := map[string]interface{}{
-		"order":    0,
-		"template": "chat",
-		"settings": map[string]interface{}{
-			"index": map[string]interface{}{
-				"number_of_replicas": "0",
-			},
-		},
-		"mappings": map[string]interface{}{
-			"chat": map[string]interface{}{
-				"properties": map[string]interface{}{
-					"topic": map[string]interface{}{
-						"index": "not_analyzed",
-						"type":  "string",
-					},
-				},
-			},
-		},
-	}
-
-	indexTemplate, _ := json.Marshal(indexTemplateMap)
-
-	req, _ := http.NewRequest(
-		"PUT",
-		"http://localhost:9123/_template/chat",
-		strings.NewReader(string(indexTemplate)),
-	)
-
-	client.Do(req)
-}
 
 // GetDefaultTestApp retrieve a default app for testing purposes
 func GetDefaultTestApp() *app.App {
 	viper.SetConfigFile("../config/test.yaml")
 	app := app.GetApp("0.0.0.0", 8888, true)
-
-	esclient := es.GetESClient()
-	esclient.DeleteIndex("chat")
-	createIndexTemplate()
-	esclient.CreateIndex("chat")
 
 	return app
 }

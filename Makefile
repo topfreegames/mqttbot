@@ -21,8 +21,12 @@ run-containers:
 kill-containers:
 	@cd test_containers && docker-compose stop && cd ..
 
+create-es-index-template:
+	@bash create_es_index_template.sh
+
 run-tests: run-containers
 	@sleep 5
+	@make create-es-index-template
 	@make coverage
 	@make kill-containers
 
