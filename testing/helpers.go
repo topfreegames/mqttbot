@@ -45,15 +45,16 @@ func createIndexTemplate() {
 			},
 		},
 	}
-	indexTemplate, err := json.Marshal(indexTemplateMap)
-	fmt.Println(err)
 
-	req, err := http.NewRequest("PUT", "http://localhost:9123/_template/chat", strings.NewReader(string(indexTemplate)))
-	fmt.Println(err)
+	indexTemplate, _ := json.Marshal(indexTemplateMap)
 
-	response, err := client.Do(req)
-	fmt.Println(err)
-	fmt.Println(response)
+	req, _ := http.NewRequest(
+		"PUT",
+		"http://localhost:9123/_template/chat",
+		strings.NewReader(string(indexTemplate)),
+	)
+
+	client.Do(req)
 }
 
 // GetDefaultTestApp retrieve a default app for testing purposes

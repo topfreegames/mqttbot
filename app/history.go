@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -63,8 +64,21 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 					messages = append(messages, t)
 				}
 			}
+			resStr, err := json.Marshal(messages)
+			if err != nil {
+				return err
+			}
+
+			logger.Logger.Debugf(
+				"responded to user %s history for topic %s with args from=%d and limit=%d with code=%s and message=%s",
+				userID, topic, from, limit, http.StatusOK, echo.ErrUnauthorized.Message, string(resStr),
+			)
 			return c.JSON(http.StatusOK, messages)
 		}
+		logger.Logger.Debugf(
+			"responded to user %s history for topic %s with args from=%d and limit=%d with code=%s and message=%s",
+			userID, topic, from, limit, echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message,
+		)
 		return c.String(echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message)
 	}
 }
