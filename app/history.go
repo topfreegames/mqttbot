@@ -70,13 +70,13 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 			}
 
 			logger.Logger.Debugf(
-				"responded to user %s history for topic %s with args from=%d and limit=%d with code=%s and message=%s",
-				userID, topic, from, limit, http.StatusOK, echo.ErrUnauthorized.Message, string(resStr),
+				"responded to user %s history for topic %s with args from=%d and limit=%d with code=%d and message=%s",
+				userID, topic, from, limit, http.StatusOK, string(resStr),
 			)
 			return c.JSON(http.StatusOK, messages)
 		}
 		logger.Logger.Debugf(
-			"responded to user %s history for topic %s with args from=%d and limit=%d with code=%s and message=%s",
+			"responded to user %s history for topic %s with args from=%d and limit=%d with code=%d and message=%s",
 			userID, topic, from, limit, echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message,
 		)
 		return c.String(echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message)
@@ -148,13 +148,13 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 				return err
 			}
 			logger.Logger.Debugf(
-				"responded to user %s history for topic %s with args from=%d limit=%d and since=%s with code=%s and message=%s",
-				userID, topic, from, limit, since, http.StatusOK, echo.ErrUnauthorized.Message, string(resStr),
+				"responded to user %s history for topic %s with args from=%d limit=%d and since=%s with code=%d and message=%s",
+				userID, topic, from, limit, since, http.StatusOK, string(resStr),
 			)
 			return c.JSON(http.StatusOK, messages)
 		}
 		logger.Logger.Debugf(
-			"responded to user %s history for topic %s with args from=%d limit=%d and since=%s with code=%s and message=%s",
+			"responded to user %s history for topic %s with args from=%d limit=%d and since=%s with code=%d and message=%s",
 			userID, topic, from, limit, since, echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message,
 		)
 		return c.String(echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message)
