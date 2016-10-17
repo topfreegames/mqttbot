@@ -142,8 +142,21 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 					messages = append(messages, t)
 				}
 			}
+
+			resStr, err := json.Marshal(messages)
+			if err != nil {
+				return err
+			}
+			logger.Logger.Debugf(
+				"responded to user %s history for topic %s with args from=%d limit=%d and since=%s with code=%s and message=%s",
+				userID, topic, from, limit, since, http.StatusOK, echo.ErrUnauthorized.Message, string(resStr),
+			)
 			return c.JSON(http.StatusOK, messages)
 		}
+		logger.Logger.Debugf(
+			"responded to user %s history for topic %s with args from=%d limit=%d and since=%s with code=%s and message=%s",
+			userID, topic, from, limit, since, echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message,
+		)
 		return c.String(echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message)
 	}
 }
