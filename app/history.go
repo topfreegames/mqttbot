@@ -47,9 +47,9 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 		redisResults := (r.([]interface{}))
 		if redisResults[0] != nil && redisResults[1] != nil {
 			boolQuery := elastic.NewBoolQuery()
-			// FIXME: Dont think this is the best way for searching
-			matchTopicQuery := elastic.NewMatchQuery("topic", topic).MinimumShouldMatch("100%")
-			boolQuery.Filter(matchTopicQuery)
+
+			termQuery := elastic.NewTermQuery("topic", topic)
+			boolQuery.Must(termQuery)
 
 			searchResults, err := esclient.Search().Index("chat").Query(boolQuery).
 				Sort("timestamp", false).From(from).Size(limit).Do()
@@ -98,8 +98,10 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 		redisResults := (r.([]interface{}))
 		if redisResults[0] != nil && redisResults[1] != nil {
 			boolQuery := elastic.NewBoolQuery()
-			// FIXME: Dont think this is the best way for searching
-			matchTopicQuery := elastic.NewMatchQuery("topic", topic).MinimumShouldMatch("100%")
+
+			termQuery := elastic.NewTermQuery("topic", topic)
+			boolQuery.Must(termQuery)
+
 			if since != "" {
 				rangeQuery := elastic.NewRangeQuery("timestamp").
 					From(since).
@@ -107,10 +109,9 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 					IncludeLower(true).
 					IncludeUpper(true)
 
-				boolQuery.Must(rangeQuery)
-				boolQuery.Filter(matchTopicQuery)
+				boolQuery.Must(rangeQuery, termQuery)
 			} else {
-				boolQuery.Filter(matchTopicQuery)
+				boolQuery.Must(termQuery)
 			}
 
 			searchResults, err := esclient.Search().Index("chat").Query(boolQuery).

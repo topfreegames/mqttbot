@@ -41,10 +41,9 @@ func TestHistoryHandler(t *testing.T) {
 
 	g.Describe("History", func() {
 		esclient := es.GetESClient()
+
 		g.BeforeEach(func() {
-			esclient.DeleteIndex("chat")
 			refreshIndex()
-			// esclient.CreateIndex("chat")
 		})
 
 		g.Describe("History Handler", func() {
