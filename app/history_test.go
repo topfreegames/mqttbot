@@ -82,6 +82,26 @@ func TestHistoryHandler(t *testing.T) {
 				err = json.Unmarshal([]byte(body), &messages)
 				Expect(err).To(BeNil())
 			})
+
+			g.It("It should return 200 and [] if the user is authorized into the topic and there are no messages", func() {
+				a := GetDefaultTestApp()
+				testId := strings.Replace(uuid.NewV4().String(), "-", "", -1)
+				topic := fmt.Sprintf("chat/test_%s", testId)
+				authStr := fmt.Sprintf("test:test-%s", topic)
+				rc := redisclient.GetRedisClient("localhost", 4444, "")
+				_, err := rc.Pool.Get().Do("set", "test:test", "lalala")
+				_, err = rc.Pool.Get().Do("set", authStr, 2)
+				Expect(err).To(BeNil())
+
+				refreshIndex()
+				path := fmt.Sprintf("/history/%s?userid=test:test", topic)
+				status, body := Get(a, path, t)
+				g.Assert(status).Equal(http.StatusOK)
+
+				var messages []Message
+				err = json.Unmarshal([]byte(body), &messages)
+				Expect(err).To(BeNil())
+			})
 		})
 
 		g.Describe("History Since Handler", func() {
@@ -115,6 +135,27 @@ func TestHistoryHandler(t *testing.T) {
 
 				refreshIndex()
 
+				path := fmt.Sprintf("/historysince/%s?userid=test:test", topic)
+				status, body := Get(a, path, t)
+				g.Assert(status).Equal(http.StatusOK)
+
+				var messages []Message
+				err = json.Unmarshal([]byte(body), &messages)
+				Expect(err).To(BeNil())
+			})
+
+			g.It("It should return 200 and [] if the user is authorized into the topic and there are no messages", func() {
+				a := GetDefaultTestApp()
+				testId := strings.Replace(uuid.NewV4().String(), "-", "", -1)
+				topic := fmt.Sprintf("chat/test_%s", testId)
+				authStr := fmt.Sprintf("test:test-%s", topic)
+
+				rc := redisclient.GetRedisClient("localhost", 4444, "")
+				_, err := rc.Pool.Get().Do("set", "test:test", "lalala")
+				_, err = rc.Pool.Get().Do("set", authStr, 2)
+				Expect(err).To(BeNil())
+
+				refreshIndex()
 				path := fmt.Sprintf("/historysince/%s?userid=test:test", topic)
 				status, body := Get(a, path, t)
 				g.Assert(status).Equal(http.StatusOK)

@@ -10,3 +10,5 @@ curl -XDELETE 'http://localhost:9123/chat'
 echo ''
 echo 'Create chat index (now with the correct index): '
 curl -XPOST 'http://localhost:9123/chat'
+
+echo ''
