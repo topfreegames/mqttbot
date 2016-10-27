@@ -216,7 +216,7 @@ func TestHistoryHandler(t *testing.T) {
 				_, err = rc.Pool.Get().Do("set", authStr, 2)
 				Expect(err).To(BeNil())
 
-				now := time.Now().UnixNano() / 1000000000
+				now := time.Now().UnixNano() / 1000000
 				testMessage := Message{}
 				second := int64(1000)
 				baseTime := now - (second * 70)
@@ -236,7 +236,7 @@ func TestHistoryHandler(t *testing.T) {
 
 				path := fmt.Sprintf(
 					"/historysince/%s?userid=test:test&since=%d&limit=%d&from=%d",
-					topic, baseTime, 10, 0,
+					topic, baseTime/1000, 10, 0,
 				)
 
 				status, body := Get(a, path, t)
@@ -264,10 +264,10 @@ func TestHistoryHandler(t *testing.T) {
 			_, err = rc.Pool.Get().Do("set", authStr, 2)
 			Expect(err).To(BeNil())
 
-			startTime := time.Now().UnixNano() / 1000000000
+			startTime := time.Now().UnixNano() / 1000000
 			testMessage := Message{}
 			for i := 0; i < 3; i++ {
-				messageTime := time.Now().UnixNano() / 1000000000
+				messageTime := time.Now().UnixNano() / 1000000
 				testMessage = Message{
 					Timestamp: msToTime(messageTime),
 					Payload:   "{\"test1\":\"test2\"}",
@@ -285,7 +285,7 @@ func TestHistoryHandler(t *testing.T) {
 
 			path := fmt.Sprintf(
 				"/historysince/%s?userid=test:test&since=%d&limit=%d&from=%d",
-				topic, startTime, 10, 0,
+				topic, startTime/1000, 10, 0,
 			)
 
 			status, body := Get(a, path, t)
@@ -312,10 +312,10 @@ func TestHistoryHandler(t *testing.T) {
 			_, err = rc.Pool.Get().Do("set", authStr, 2)
 			Expect(err).To(BeNil())
 
-			startTime := time.Now().UnixNano() / 1000000000
+			startTime := time.Now().UnixNano() / 1000000
 			testMessage := Message{}
 			for i := 0; i < 3; i++ {
-				messageTime := time.Now().UnixNano() / 1000000000
+				messageTime := time.Now().UnixNano() / 1000000
 				testMessage = Message{
 					Timestamp: msToTime(messageTime),
 					Payload:   "{\"test1\":\"test2\"}",
@@ -333,7 +333,7 @@ func TestHistoryHandler(t *testing.T) {
 
 			path := fmt.Sprintf(
 				"/historysince/%s?userid=test:test&since=%d&limit=%d&from=%d",
-				topic, startTime, 1, 0,
+				topic, startTime/1000, 1, 0,
 			)
 
 			status, body := Get(a, path, t)

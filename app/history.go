@@ -97,7 +97,7 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 		userID := c.QueryParam("userid")
 		from, err := strconv.Atoi(c.QueryParam("from"))
 		limit, err := strconv.Atoi(c.QueryParam("limit"))
-		since := c.QueryParam("since")
+		since, err := strconv.ParseInt(c.QueryParam("since"), 10, 64)
 
 		defaultLimit := 10
 		if limitFromEnv := os.Getenv("HISTORYSINCE_LIMIT"); limitFromEnv != "" {
@@ -107,7 +107,7 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 			limit = defaultLimit
 		}
 
-		logger.Logger.Debugf("user %s is asking for history for topic %s with args from=%d, limit=%d and since=%s", userID, topic, from, limit, since)
+		logger.Logger.Debugf("user %s is asking for history for topic %s with args from=%d, limit=%d and since=%d", userID, topic, from, limit, since)
 		rc := app.RedisClient.Pool.Get()
 		defer rc.Close()
 		rc.Send("MULTI")
@@ -123,19 +123,12 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 			boolQuery := elastic.NewBoolQuery()
 
 			termQuery := elastic.NewTermQuery("topic", topic)
-			boolQuery.Must(termQuery)
-
-			if since != "" {
-				rangeQuery := elastic.NewRangeQuery("timestamp").
-					From(since).
-					To(nil).
-					IncludeLower(true).
-					IncludeUpper(true)
-
-				boolQuery.Must(rangeQuery, termQuery)
-			} else {
-				boolQuery.Must(termQuery)
-			}
+			rangeQuery := elastic.NewRangeQuery("timestamp").
+				From(since * 1000). // FIXME: The client should send time in milliseconds
+				To(nil).
+				IncludeLower(true).
+				IncludeUpper(true)
+			boolQuery.Must(rangeQuery, termQuery)
 
 			searchResults, err := esclient.Search().Index("chat").Query(boolQuery).
 				Sort("timestamp", false).From(from).Size(limit).Do()
@@ -157,13 +150,13 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 				return err
 			}
 			logger.Logger.Debugf(
-				"responded to user %s history for topic %s with args from=%d limit=%d and since=%s with code=%d and message=%s",
+				"responded to user %s history for topic %s with args from=%d limit=%d and since=%d with code=%d and message=%s",
 				userID, topic, from, limit, since, http.StatusOK, string(resStr),
 			)
 			return c.JSON(http.StatusOK, messages)
 		}
 		logger.Logger.Debugf(
-			"responded to user %s history for topic %s with args from=%d limit=%d and since=%s with code=%d and message=%s",
+			"responded to user %s history for topic %s with args from=%d limit=%d and since=%d with code=%d and message=%s",
 			userID, topic, from, limit, since, echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message,
 		)
 		return c.String(echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message)
