@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"reflect"
 	"strconv"
 	"time"
@@ -31,8 +32,12 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 		from, err := strconv.Atoi(c.QueryParam("from"))
 		limit, err := strconv.Atoi(c.QueryParam("limit"))
 
+		defaultLimit := 10
+		if limitFromEnv := os.Getenv("HISTORY_LIMIT"); limitFromEnv != "" {
+			defaultLimit, err = strconv.Atoi(limitFromEnv)
+		}
 		if limit == 0 {
-			limit = 10
+			limit = defaultLimit
 		}
 
 		logger.Logger.Debugf("user %s is asking for history for topic %s with args from=%d and limit=%d", userID, topic, from, limit)
@@ -94,8 +99,12 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 		limit, err := strconv.Atoi(c.QueryParam("limit"))
 		since := c.QueryParam("since")
 
+		defaultLimit := 10
+		if limitFromEnv := os.Getenv("HISTORYSINCE_LIMIT"); limitFromEnv != "" {
+			defaultLimit, err = strconv.Atoi(limitFromEnv)
+		}
 		if limit == 0 {
-			limit = 10
+			limit = defaultLimit
 		}
 
 		logger.Logger.Debugf("user %s is asking for history for topic %s with args from=%d, limit=%d and since=%s", userID, topic, from, limit, since)

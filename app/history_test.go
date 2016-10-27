@@ -184,7 +184,7 @@ func TestHistoryHandler(t *testing.T) {
 
 				path := fmt.Sprintf(
 					"/historysince/%s?userid=test:test&since=%d",
-					topic, (time.Now().UnixNano() / 1000000), // now
+					topic, (time.Now().UnixNano() / 1000000000), // now
 				)
 				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do()
 				Expect(err).To(BeNil())
@@ -216,7 +216,7 @@ func TestHistoryHandler(t *testing.T) {
 				_, err = rc.Pool.Get().Do("set", authStr, 2)
 				Expect(err).To(BeNil())
 
-				now := time.Now().UnixNano() / 1000000
+				now := time.Now().UnixNano() / 1000000000
 				testMessage := Message{}
 				second := int64(1000)
 				baseTime := now - (second * 70)
@@ -264,10 +264,10 @@ func TestHistoryHandler(t *testing.T) {
 			_, err = rc.Pool.Get().Do("set", authStr, 2)
 			Expect(err).To(BeNil())
 
-			startTime := time.Now().UnixNano() / 1000000
+			startTime := time.Now().UnixNano() / 1000000000
 			testMessage := Message{}
 			for i := 0; i < 3; i++ {
-				messageTime := time.Now().UnixNano() / 1000000
+				messageTime := time.Now().UnixNano() / 1000000000
 				testMessage = Message{
 					Timestamp: msToTime(messageTime),
 					Payload:   "{\"test1\":\"test2\"}",
@@ -312,10 +312,10 @@ func TestHistoryHandler(t *testing.T) {
 			_, err = rc.Pool.Get().Do("set", authStr, 2)
 			Expect(err).To(BeNil())
 
-			startTime := time.Now().UnixNano() / 1000000
+			startTime := time.Now().UnixNano() / 1000000000
 			testMessage := Message{}
 			for i := 0; i < 3; i++ {
-				messageTime := time.Now().UnixNano() / 1000000
+				messageTime := time.Now().UnixNano() / 1000000000
 				testMessage = Message{
 					Timestamp: msToTime(messageTime),
 					Payload:   "{\"test1\":\"test2\"}",
