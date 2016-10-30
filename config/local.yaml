@@ -35,13 +35,13 @@ mqttserver:
         - plugin: "add_user_subscription_acl"
           messagePattern: "aclpermitsubscription"
 elasticsearch:
-  host: "http://localhost:9200"
+  host: "http://localhost:9123"
   sniff: false
   indexMappings:
     chat: '{ "mappings": { "message":{"_ttl": { "enabled": true, "default": "2d" }}}}'
 redis:
   host: "localhost"
-  port: 6379
+  port: 4444
   password: ""
   maxPoolSize: 10
 logger:
