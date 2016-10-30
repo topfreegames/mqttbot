@@ -3,6 +3,7 @@ package echo
 import (
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"mime"
 	"mime/multipart"
@@ -16,39 +17,20 @@ import (
 
 	"bytes"
 
-	"golang.org/x/net/context"
+	"github.com/labstack/echo/context"
 )
 
 type (
 	// Context represents the context of the current HTTP request. It holds request and
 	// response objects, path, path parameters, data and registered handler.
 	Context interface {
-		// Context returns `net/context.Context`.
-		Context() context.Context
+		context.Context
 
-		// SetContext sets `net/context.Context`.
-		SetContext(context.Context)
+		// StdContext returns `context.Context`.
+		StdContext() context.Context
 
-		// Deadline returns the time when work done on behalf of this context
-		// should be canceled.  Deadline returns ok==false when no deadline is
-		// set.  Successive calls to Deadline return the same results.
-		Deadline() (deadline time.Time, ok bool)
-
-		// Done returns a channel that's closed when work done on behalf of this
-		// context should be canceled.  Done may return nil if this context can
-		// never be canceled.  Successive calls to Done return the same value.
-		Done() <-chan struct{}
-
-		// Err returns a non-nil error value after Done is closed.  Err returns
-		// Canceled if the context was canceled or DeadlineExceeded if the
-		// context's deadline passed.  No other values for Err are defined.
-		// After Done is closed, successive calls to Err return the same value.
-		Err() error
-
-		// Value returns the value associated with this context for key, or nil
-		// if no value is associated with key.  Successive calls to Value with
-		// the same key returns the same result.
-		Value(key interface{}) interface{}
+		// SetStdContext sets `context.Context`.
+		SetStdContext(context.Context)
 
 		// Request returns `engine.Request` interface.
 		Request() engine.Request
@@ -146,11 +128,21 @@ type (
 		// the JSONP payload.
 		JSONP(int, string, interface{}) error
 
+		// JSONPBlob sends a JSONP blob response with status code. It uses `callback`
+		// to construct the JSONP payload.
+		JSONPBlob(int, string, []byte) error
+
 		// XML sends an XML response with status code.
 		XML(int, interface{}) error
 
 		// XMLBlob sends a XML blob response with status code.
 		XMLBlob(int, []byte) error
+
+		// Blob sends a blob response with status code and content type.
+		Blob(int, string, []byte) error
+
+		// Stream sends a streaming response with status code and content type.
+		Stream(int, string, io.Reader) error
 
 		// File sends a response with the content of the file.
 		File(string) error
@@ -158,6 +150,10 @@ type (
 		// Attachment sends a response from `io.ReaderSeeker` as attachment, prompting
 		// client to save the file.
 		Attachment(io.ReadSeeker, string) error
+
+		// Inline sends a response from `io.ReaderSeeker` as inline, opening
+		// the file in the browser.
+		Inline(io.ReadSeeker, string) error
 
 		// NoContent sends a response with no body and a status code.
 		NoContent(int) error
@@ -207,11 +203,11 @@ const (
 	indexPage = "index.html"
 )
 
-func (c *echoContext) Context() context.Context {
+func (c *echoContext) StdContext() context.Context {
 	return c.context
 }
 
-func (c *echoContext) SetContext(ctx context.Context) {
+func (c *echoContext) SetStdContext(ctx context.Context) {
 	c.context = ctx
 }
 
@@ -370,10 +366,7 @@ func (c *echoContext) JSON(code int, i interface{}) (err error) {
 }
 
 func (c *echoContext) JSONBlob(code int, b []byte) (err error) {
-	c.response.Header().Set(HeaderContentType, MIMEApplicationJSONCharsetUTF8)
-	c.response.WriteHeader(code)
-	_, err = c.response.Write(b)
-	return
+	return c.Blob(code, MIMEApplicationJSONCharsetUTF8, b)
 }
 
 func (c *echoContext) JSONP(code int, callback string, i interface{}) (err error) {
@@ -381,6 +374,10 @@ func (c *echoContext) JSONP(code int, callback string, i interface{}) (err error
 	if err != nil {
 		return err
 	}
+	return c.JSONPBlob(code, callback, b)
+}
+
+func (c *echoContext) JSONPBlob(code int, callback string, b []byte) (err error) {
 	c.response.Header().Set(HeaderContentType, MIMEApplicationJavaScriptCharsetUTF8)
 	c.response.WriteHeader(code)
 	if _, err = c.response.Write([]byte(callback + "(")); err != nil {
@@ -405,12 +402,23 @@ func (c *echoContext) XML(code int, i interface{}) (err error) {
 }
 
 func (c *echoContext) XMLBlob(code int, b []byte) (err error) {
-	c.response.Header().Set(HeaderContentType, MIMEApplicationXMLCharsetUTF8)
-	c.response.WriteHeader(code)
 	if _, err = c.response.Write([]byte(xml.Header)); err != nil {
 		return
 	}
+	return c.Blob(code, MIMEApplicationXMLCharsetUTF8, b)
+}
+
+func (c *echoContext) Blob(code int, contentType string, b []byte) (err error) {
+	c.response.Header().Set(HeaderContentType, contentType)
+	c.response.WriteHeader(code)
 	_, err = c.response.Write(b)
+	return
+}
+
+func (c *echoContext) Stream(code int, contentType string, r io.Reader) (err error) {
+	c.response.Header().Set(HeaderContentType, contentType)
+	c.response.WriteHeader(code)
+	_, err = io.Copy(c.response, r)
 	return
 }
 
@@ -436,8 +444,16 @@ func (c *echoContext) File(file string) error {
 }
 
 func (c *echoContext) Attachment(r io.ReadSeeker, name string) (err error) {
+	return c.contentDisposition(r, name, "attachment")
+}
+
+func (c *echoContext) Inline(r io.ReadSeeker, name string) (err error) {
+	return c.contentDisposition(r, name, "inline")
+}
+
+func (c *echoContext) contentDisposition(r io.ReadSeeker, name, dispositionType string) (err error) {
 	c.response.Header().Set(HeaderContentType, ContentTypeByExtension(name))
-	c.response.Header().Set(HeaderContentDisposition, "attachment; filename="+name)
+	c.response.Header().Set(HeaderContentDisposition, fmt.Sprintf("%s; filename=%s", dispositionType, name))
 	c.response.WriteHeader(http.StatusOK)
 	_, err = io.Copy(c.response, r)
 	return
@@ -508,5 +524,5 @@ func (c *echoContext) Reset(req engine.Request, res engine.Response) {
 	c.context = context.Background()
 	c.request = req
 	c.response = res
-	c.handler = notFoundHandler
+	c.handler = NotFoundHandler
 }

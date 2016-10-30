@@ -80,7 +80,7 @@ func WithConfig(c engine.Config) (s *Server) {
 			},
 		},
 		handler: engine.HandlerFunc(func(req engine.Request, res engine.Response) {
-			s.logger.Error("handler not set, use `SetHandler()` to set it.")
+			panic("echo: handler not set, use `Server#SetHandler()` to set it.")
 		}),
 		logger: glog.New("echo"),
 	}
@@ -107,6 +107,12 @@ func (s *Server) Start() error {
 	}
 	return s.startCustomListener()
 
+}
+
+// Stop implements `engine.Server#Stop` function.
+func (s *Server) Stop() error {
+	// TODO: implement `engine.Server#Stop` function
+	return nil
 }
 
 func (s *Server) startDefaultListener() error {

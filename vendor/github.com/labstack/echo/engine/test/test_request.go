@@ -21,7 +21,7 @@ Cache-Control: no-cache
 Accept-Language: de,en;q=0.7,en-us;q=0.3
 Referer: https://github.com/
 Cookie: session=securetoken; user=123
-X-Real-IP: 127.0.0.1
+X-Real-IP: 192.168.1.1
 
 --Asrf456BGe4h
 Content-Disposition: form-data; name="foo"
@@ -41,18 +41,18 @@ Hello world!
 
 func RequestTest(t *testing.T, request engine.Request) {
 	assert.Equal(t, "github.com", request.Host())
-
+	request.SetHost("labstack.com")
+	assert.Equal(t, "labstack.com", request.Host())
 	request.SetURI("/labstack/echo?token=54321")
 	assert.Equal(t, "/labstack/echo?token=54321", request.URI())
-
 	assert.Equal(t, "/labstack/echo", request.URL().Path())
 	assert.Equal(t, "https://github.com/", request.Referer())
-	assert.Equal(t, "127.0.0.1", request.Header().Get("X-Real-IP"))
+	assert.Equal(t, "192.168.1.1", request.Header().Get("X-Real-IP"))
 	assert.Equal(t, "http", request.Scheme())
 	assert.Equal(t, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; de-de) AppleWebKit/523.10.3 (KHTML, like Gecko) Version/3.0.4 Safari/523.10", request.UserAgent())
 	assert.Equal(t, "127.0.0.1", request.RemoteAddress())
+	assert.Equal(t, "192.168.1.1", request.RealIP())
 	assert.Equal(t, "POST", request.Method())
-
 	assert.Equal(t, int64(261), request.ContentLength())
 	assert.Equal(t, "bar", request.FormValue("foo"))
 
@@ -86,5 +86,12 @@ func RequestTest(t *testing.T, request engine.Request) {
 	_, err := request.Cookie("foo")
 	assert.Error(t, err)
 
-	assert.Equal(t, 2, len(request.Cookies()))
+	// Cookies
+	cs := request.Cookies()
+	if assert.Len(t, cs, 2) {
+		assert.Equal(t, "session", cs[0].Name())
+		assert.Equal(t, "securetoken", cs[0].Value())
+		assert.Equal(t, "user", cs[1].Name())
+		assert.Equal(t, "123", cs[1].Value())
+	}
 }

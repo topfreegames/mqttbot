@@ -1,9 +1,11 @@
 package standard
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"strings"
 
@@ -56,12 +58,17 @@ func (r *Request) Host() string {
 	return r.Request.Host
 }
 
+// SetHost implements `engine.Request#SetHost` function.
+func (r *Request) SetHost(host string) {
+	r.Request.Host = host
+}
+
 // URL implements `engine.Request#URL` function.
 func (r *Request) URL() engine.URL {
 	return r.url
 }
 
-// Header implements `engine.Request#URL` function.
+// Header implements `engine.Request#Header` function.
 func (r *Request) Header() engine.Header {
 	return r.header
 }
@@ -96,6 +103,19 @@ func (r *Request) UserAgent() string {
 // RemoteAddress implements `engine.Request#RemoteAddress` function.
 func (r *Request) RemoteAddress() string {
 	return r.RemoteAddr
+}
+
+// RealIP implements `engine.Request#RealIP` function.
+func (r *Request) RealIP() string {
+	ra := r.RemoteAddress()
+	if ip := r.Header().Get(echo.HeaderXForwardedFor); ip != "" {
+		ra = ip
+	} else if ip := r.Header().Get(echo.HeaderXRealIP); ip != "" {
+		ra = ip
+	} else {
+		ra, _, _ = net.SplitHostPort(ra)
+	}
+	return ra
 }
 
 // Method implements `engine.Request#Method` function.
@@ -137,11 +157,11 @@ func (r *Request) FormValue(name string) string {
 func (r *Request) FormParams() map[string][]string {
 	if strings.HasPrefix(r.header.Get(echo.HeaderContentType), echo.MIMEMultipartForm) {
 		if err := r.ParseMultipartForm(defaultMemory); err != nil {
-			r.logger.Error(err)
+			panic(fmt.Sprintf("echo: %v", err))
 		}
 	} else {
 		if err := r.ParseForm(); err != nil {
-			r.logger.Error(err)
+			panic(fmt.Sprintf("echo: %v", err))
 		}
 	}
 	return map[string][]string(r.Request.Form)

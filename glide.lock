@@ -1,47 +1,29 @@
 hash: 99c1c43468638602616a67384c29f0bcf0cf07bd86474501b905d58f6b762b7c
-updated: 2016-09-13T13:24:47.571764486-03:00
+updated: 2016-10-30T14:46:59.857849981-02:00
 imports:
 - name: github.com/ajg/form
   version: 523a5da1a92f01b01f840b61689c0340a0243532
-- name: github.com/certifi/gocertifi
-  version: ec89d50f00d39494f5b3ec5cf2fe75c53467a937
 - name: github.com/cjoudrey/gluahttp
-  version: ff6d15994ab4e602c1531b684328dd28396bfaab
-- name: github.com/davecgh/go-spew
-  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
-  subpackages:
-  - spew
+  version: b4bfe0c50fea948dcbf3966e120996d6607bbd89
 - name: github.com/eclipse/paho.mqtt.golang
-  version: b0f0cce24f138f7a1d034f55069883c7dcb6a9d7
+  version: 13afcbe8e41508479762a90e9242577210c2ca8d
   subpackages:
   - packets
-- name: github.com/fatih/structs
-  version: dc3312cb1a4513a366c4c9e622ad55c32df12ed3
 - name: github.com/franela/goblin
   version: efa9910a3ea4ccb7ee4b977571318af2e51ba05f
 - name: github.com/fsnotify/fsnotify
   version: f12c6236fe7b5cf6bcf30e5935d08cb079d78334
 - name: github.com/garyburd/redigo
-  version: ffa8d46ada782d81cfda81a0fbd9f45ceae448e8
+  version: 80f7de34463b0ed3d7c61303e5619efe1b227f92
   subpackages:
   - internal
   - redis
-- name: github.com/gavv/gojsondiff
-  version: 36046c6e558e7f854ebd3fd97d1e9812ebe8709b
-  subpackages:
-  - formatter
 - name: github.com/gavv/httpexpect
-  version: 445f10d0ea3df01f78f350cbb01dd4a360d56d93
-- name: github.com/gavv/monotime
-  version: 259cd7b345f5aa080eff16f21d7866ef7dea9528
+  version: ab5f666af253b969504c317d702c554ecf9493cc
 - name: github.com/getsentry/raven-go
-  version: 379f8d0a68ca237cf8893a1cdfd4f574125e2c51
-- name: github.com/google/go-querystring
-  version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
-  subpackages:
-  - query
+  version: c9d3cc542ad199f62c0264286be537f9bce6063c
 - name: github.com/hashicorp/hcl
-  version: 99df0eb941dd8ddbc83d3f3605a34f6a686ac85e
+  version: baeb59c710717b06aac1dbe2270e8192ec593244
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -51,29 +33,19 @@ imports:
   - json/parser
   - json/scanner
   - json/token
-- name: github.com/imkira/go-interpol
-  version: b9781c93ae51c8b4fc3af1b1426909721af0a624
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
-- name: github.com/klauspost/compress
-  version: 08fe86a420401e830c24114bdf9f1ba91331407a
-  subpackages:
-  - flate
-  - gzip
-  - zlib
-- name: github.com/klauspost/cpuid
-  version: 09cded8978dc9e80714c4d85b0322337b0a1e5e0
-- name: github.com/klauspost/crc32
-  version: 19b0b332c9e4516a6370a0456e6182c3b5036720
 - name: github.com/kr/fs
   version: 2788f0dbd16903de03cb8186e5c7d97b69ad387b
 - name: github.com/labstack/echo
-  version: fbcdf70c52c155ae9aa58e72ee0532fa2f1cad2e
+  version: 04e6901d05b58ddbae579a6252a3d1bb3f334adc
   subpackages:
+  - context
   - engine
+  - engine/standard
   - log
 - name: github.com/labstack/gommon
-  version: 431777a5117c8de4352a400dad1e2a55f484b189
+  version: 2d272df536d051e737aea353b86c979d6e88bce0
   subpackages:
   - color
   - log
@@ -82,21 +54,20 @@ imports:
 - name: github.com/layeh/gopher-luar
   version: 921d03e21a7844141b02d4c729269b6709762f28
 - name: github.com/magiconair/properties
-  version: 0723e352fa358f9322c938cc2dadda874e9151a9
+  version: 61b492c03cf472e0c6419be5899b8e0dc28b1b88
 - name: github.com/mattn/go-colorable
   version: ed8eb9e318d7a84ce5915b495b7d35e0cfe7b5a8
 - name: github.com/mattn/go-isatty
   version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
 - name: github.com/mitchellh/mapstructure
   version: ca63d7c062ee3c9f34db231e352b60012b4fd0c1
-- name: github.com/moul/http2curl
-  version: b1479103caacaa39319f75e7f57fc545287fca0d
 - name: github.com/onsi/gomega
-  version: 4dfabf7db2e4147ec99a86db32b2f2a3484cfee8
+  version: c90bd38f8da6e92f8b114953db2f0ad7361fb4b4
   subpackages:
   - format
   - internal/assertion
   - internal/asyncassertion
+  - internal/oraclematcher
   - internal/testingtsupport
   - matchers
   - matchers/support/goraph/bipartitegraph
@@ -109,21 +80,13 @@ imports:
 - name: github.com/pelletier/go-buffruneio
   version: df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d
 - name: github.com/pelletier/go-toml
-  version: 31055c2ff0bb0c7f9095aec0d220aed21108121e
+  version: 5a62685873ef617233ab5f1b825a6e4a758e16cf
 - name: github.com/pkg/errors
   version: 17b591df37844cde689f4d5813e5cea0927d8dd2
 - name: github.com/pkg/sftp
-  version: 8197a2e580736b78d704be0fc47b2324c0591a32
-- name: github.com/pmezard/go-difflib
-  version: 792786c7400a136282c1664665ae0a8db921c6c2
-  subpackages:
-  - difflib
+  version: a71e8f580e3b622ebff585309160b1cc549ef4d2
 - name: github.com/satori/go.uuid
   version: 0aa62d5ddceb50dbcb909d790b5345affd3669b6
-- name: github.com/sergi/go-diff
-  version: 97b2266dfe4bd4ea1b81a463322f04f8b724801e
-  subpackages:
-  - diffmatchpatch
 - name: github.com/spf13/afero
   version: 20500e2abd0d1f4564a499e83d11d6c73cd58c27
   subpackages:
@@ -132,48 +95,29 @@ imports:
 - name: github.com/spf13/cast
   version: e31f36ffc91a2ba9ddb72a4b6a607ff9b3d3cb63
 - name: github.com/spf13/cobra
-  version: 9c28e4bbd74e5c3ed7aacbc552b2cab7cfdfe744
+  version: 37c3f8060359192150945916cbc2d72bce804b4d
 - name: github.com/spf13/jwalterweatherman
   version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
 - name: github.com/spf13/pflag
-  version: 7b17cc4658ef5ca157b986ea5c0b43af7938532b
+  version: 103ce5cd2042f2fe629c1957abb64ab3e7f50235
 - name: github.com/spf13/viper
-  version: 16990631d4aa7e38f73dbbbf37fa13e67c648531
-- name: github.com/stretchr/testify
-  version: d77da356e56a7428ad25149ca77381849a6a5232
-  subpackages:
-  - assert
-  - require
+  version: 7fb2782df3d83e0036cc89f461ed0422628776f4
 - name: github.com/uber-go/atomic
   version: 0c9e689d64f004564b79d9a663634756df322902
 - name: github.com/uber-go/zap
-  version: fc9fbdfe46f6dc6a78028f22a2fb086dd13182fd
-- name: github.com/valyala/bytebufferpool
-  version: e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7
+  version: d11d2851fcabcf03421c4dbdbc3146fc74eb1035
 - name: github.com/valyala/fasthttp
-  version: 95be7a58499b79d1a42a4e9880fb90645345c021
-  subpackages:
-  - fasthttputil
+  version: 834fb48f10402a9c58ed0637ec47ba0d91f201c8
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
-- name: github.com/xeipuuv/gojsonpointer
-  version: e0fe6f68307607d540ed8eac07a342c33fa1b54a
-- name: github.com/xeipuuv/gojsonreference
-  version: e02fc20de94c78484cd5ffb007f8af96be030a45
-- name: github.com/xeipuuv/gojsonschema
-  version: 3f368bbe0e3d19097637bbdf8fdc5383ec1e25e5
-- name: github.com/yalp/jsonpath
-  version: 31a79c7593bb93eb10b163650d4a3e6ca190e4dc
-- name: github.com/yudai/golcs
-  version: d1c525dea8ce39ea9a783d33cf08932305373f2c
 - name: github.com/yuin/gopher-lua
-  version: 6a1397dfb6f8e7af08496129dd96f5f62c148f47
+  version: d0d5dd3565a9f3c86ff5bc42a0b1cc9e5bfcf55e
   subpackages:
   - ast
   - parse
   - pm
 - name: golang.org/x/crypto
-  version: e311231e83195f401421a286060d65643f9c9d40
+  version: 986d3313588aa5c68f1df95eac956f79cf3b2c01
   subpackages:
   - curve25519
   - ed25519
@@ -181,26 +125,25 @@ imports:
   - pbkdf2
   - ssh
 - name: golang.org/x/net
-  version: 749a502dd1eaf3e5bfd4f8956748c502357c0bbe
+  version: 7394c112eae4dba7e96bfcfe738e6373d61772b4
   subpackages:
   - context
   - context/ctxhttp
-  - publicsuffix
   - websocket
 - name: golang.org/x/sys
-  version: 30de6d19a3bd89a5f38ae4028e23aaa5582648af
+  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: 1e65e9bf72c307081cea196f47ef37aed17eb316
+  version: d69c40b4be55797923cec7457fac7a244d91a9b6
   subpackages:
   - transform
   - unicode/norm
 - name: gopkg.in/olivere/elastic.v3
-  version: f9fd15e1ea3a50bbe58c72a4b8820499fe3bb0e1
+  version: 1ad75b5396674e9c783400e89106bc0c8da9d786
   subpackages:
   - backoff
   - uritemplates
 - name: gopkg.in/yaml.v2
-  version: 31c299268d302dd0aa9a0dcf765a3d58971ac83f
+  version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
 testImports: []
