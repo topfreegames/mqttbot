@@ -25,7 +25,7 @@ create-es-index-template:
 	@bash create_es_index_template.sh
 
 run-tests: run-containers
-	@sleep 5
+	@/bin/bash -c "until docker exec testcontainers_elasticsearch_1 curl localhost:9200; do echo 'Waiting for Elasticsearch...' && sleep 1; done"
 	@make create-es-index-template
 	@make coverage
 	@make kill-containers
