@@ -132,6 +132,17 @@ func TestContext(t *testing.T) {
 		assert.Equal(t, "Hello, <strong>World!</strong>", rec.Body.String())
 	}
 
+	// Stream
+	rec = test.NewResponseRecorder()
+	c = e.NewContext(req, rec).(*echoContext)
+	r := strings.NewReader("response from a stream")
+	err = c.Stream(http.StatusOK, "application/octet-stream", r)
+	if assert.NoError(t, err) {
+		assert.Equal(t, http.StatusOK, rec.Status())
+		assert.Equal(t, "application/octet-stream", rec.Header().Get(HeaderContentType))
+		assert.Equal(t, "response from a stream", rec.Body.String())
+	}
+
 	// Attachment
 	rec = test.NewResponseRecorder()
 	c = e.NewContext(req, rec).(*echoContext)
@@ -141,6 +152,19 @@ func TestContext(t *testing.T) {
 		if assert.NoError(t, err) {
 			assert.Equal(t, http.StatusOK, rec.Status())
 			assert.Equal(t, "attachment; filename=walle.png", rec.Header().Get(HeaderContentDisposition))
+			assert.Equal(t, 219885, rec.Body.Len())
+		}
+	}
+
+	// Inline
+	rec = test.NewResponseRecorder()
+	c = e.NewContext(req, rec).(*echoContext)
+	file, err = os.Open("_fixture/images/walle.png")
+	if assert.NoError(t, err) {
+		err = c.Inline(file, "walle.png")
+		if assert.NoError(t, err) {
+			assert.Equal(t, http.StatusOK, rec.Status())
+			assert.Equal(t, "inline; filename=walle.png", rec.Header().Get(HeaderContentDisposition))
 			assert.Equal(t, 219885, rec.Body.Len())
 		}
 	}
@@ -328,12 +352,13 @@ func TestContextRedirect(t *testing.T) {
 }
 
 func TestContextEmbedded(t *testing.T) {
-	c := new(echoContext)
-	c.SetContext(context.WithValue(c, "key", "val"))
+	var c Context
+	c = new(echoContext)
+	c.SetStdContext(context.WithValue(c, "key", "val"))
 	assert.Equal(t, "val", c.Value("key"))
 	now := time.Now()
 	ctx, _ := context.WithDeadline(context.Background(), now)
-	c.SetContext(ctx)
+	c.SetStdContext(ctx)
 	n, _ := ctx.Deadline()
 	assert.Equal(t, now, n)
 	assert.Equal(t, context.DeadlineExceeded, c.Err())
@@ -341,7 +366,8 @@ func TestContextEmbedded(t *testing.T) {
 }
 
 func TestContextStore(t *testing.T) {
-	c := new(echoContext)
+	var c Context
+	c = new(echoContext)
 	c.Set("name", "Jon Snow")
 	assert.Equal(t, "Jon Snow", c.Get("name"))
 }
