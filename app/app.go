@@ -15,6 +15,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine"
 	"github.com/labstack/echo/engine/standard"
+	newrelic "github.com/newrelic/go-agent"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/bot"
 	"github.com/topfreegames/mqttbot/logger"
@@ -31,6 +32,7 @@ type App struct {
 	Engine      engine.Server
 	MqttBot     *bot.MqttBot
 	RedisClient *redisclient.RedisClient
+	NewRelic    newrelic.Application
 }
 
 // GetApp creates an app given the parameters
@@ -51,8 +53,28 @@ func GetApp(host string, port int, debug bool) *App {
 func (app *App) Configure() {
 	app.setConfigurationDefaults()
 	app.configureSentry()
+
+	app.configureNewRelic()
+
 	app.loadConfiguration()
 	app.configureApplication()
+}
+
+func (app *App) configureNewRelic() {
+	newRelicKey := viper.GetString("newrelic.key")
+	config := newrelic.NewConfig("mqttbot", newRelicKey)
+	if newRelicKey == "" {
+		logger.Logger.Info("New Relic is not enabled..")
+		config.Enabled = false
+	}
+	nr, err := newrelic.NewApplication(config)
+	if err != nil {
+		logger.Logger.Error("Failed to initialize New Relic.", zap.Error(err))
+		panic(fmt.Sprintf("Could not initialize New Relic, err: %s", err))
+	}
+
+	app.NewRelic = nr
+	logger.Logger.Info("Initialized New Relic successfully.")
 }
 
 func (app *App) setConfigurationDefaults() {
@@ -88,6 +110,11 @@ func (app *App) configureApplication() {
 	a.Use(NewSentryMiddleware(app).Serve)
 	a.Use(VersionMiddleware)
 	a.Use(NewRecoveryMiddleware(app.OnErrorHandler).Serve)
+	a.Use(NewNewRelicMiddleware(app, zap.New(
+		zap.NewJSONEncoder(),
+	)).Serve)
+
+	// Routes
 	a.Get("/healthcheck", HealthCheckHandler(app))
 	a.Get("/historysince/*", HistorySinceHandler(app))
 	a.Get("/history/*", HistoryHandler(app))

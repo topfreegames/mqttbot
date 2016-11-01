@@ -46,7 +46,11 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 		rc.Send("MULTI")
 		rc.Send("GET", userID)
 		rc.Send("GET", fmt.Sprintf("%s-%s", userID, topic))
-		r, err := rc.Do("EXEC")
+		var r interface{}
+		err = WithSegment("redis", c, func() error {
+			r, err = rc.Do("EXEC")
+			return err
+		})
 		if err != nil {
 			return err
 		}
@@ -57,8 +61,12 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 			termQuery := elastic.NewTermQuery("topic", topic)
 			boolQuery.Must(termQuery)
 
-			searchResults, err := esclient.Search().Index("chat").Query(boolQuery).
-				Sort("timestamp", false).From(from).Size(limit).Do()
+			var searchResults *elastic.SearchResult
+			err = WithSegment("elasticsearch", c, func() error {
+				searchResults, err = esclient.Search().Index("chat").Query(boolQuery).
+					Sort("timestamp", false).From(from).Size(limit).Do()
+				return err
+			})
 			if err != nil {
 				return err
 			}
@@ -69,7 +77,11 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 					messages = append(messages, t)
 				}
 			}
-			resStr, err := json.Marshal(messages)
+			var resStr []byte
+			err = WithSegment("response-serialize", c, func() error {
+				resStr, err = json.Marshal(messages)
+				return err
+			})
 			if err != nil {
 				return err
 			}
@@ -113,7 +125,11 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 		rc.Send("MULTI")
 		rc.Send("GET", userID)
 		rc.Send("GET", fmt.Sprintf("%s-%s", userID, topic))
-		r, err := rc.Do("EXEC")
+		var r interface{}
+		err = WithSegment("redis", c, func() error {
+			r, err = rc.Do("EXEC")
+			return err
+		})
 		if err != nil {
 			return err
 		}
@@ -129,9 +145,12 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 				IncludeLower(true).
 				IncludeUpper(true)
 			boolQuery.Must(rangeQuery, termQuery)
-
-			searchResults, err := esclient.Search().Index("chat").Query(boolQuery).
-				Sort("timestamp", false).From(from).Size(limit).Do()
+			var searchResults *elastic.SearchResult
+			err = WithSegment("elasticsearch", c, func() error {
+				searchResults, err = esclient.Search().Index("chat").Query(boolQuery).
+					Sort("timestamp", false).From(from).Size(limit).Do()
+				return err
+			})
 
 			if err != nil {
 				return err
@@ -145,7 +164,12 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 				}
 			}
 
-			resStr, err := json.Marshal(messages)
+			var resStr []byte
+			err = WithSegment("elasticsearch", c, func() error {
+				resStr, err = json.Marshal(messages)
+				return err
+			})
+
 			if err != nil {
 				return err
 			}

@@ -1,5 +1,5 @@
-hash: 99c1c43468638602616a67384c29f0bcf0cf07bd86474501b905d58f6b762b7c
-updated: 2016-10-30T14:46:59.857849981-02:00
+hash: 01685b87fc7b4e9d9cefb427a52075916c0e1c0fb23933011275bf10f3c2a93d
+updated: 2016-11-01T10:57:21.114428053-02:00
 imports:
 - name: github.com/ajg/form
   version: 523a5da1a92f01b01f840b61689c0340a0243532
@@ -16,8 +16,8 @@ imports:
 - name: github.com/garyburd/redigo
   version: 80f7de34463b0ed3d7c61303e5619efe1b227f92
   subpackages:
-  - internal
   - redis
+  - internal
 - name: github.com/gavv/httpexpect
   version: ab5f666af253b969504c317d702c554ecf9493cc
 - name: github.com/getsentry/raven-go
@@ -27,28 +27,28 @@ imports:
   subpackages:
   - hcl/ast
   - hcl/parser
-  - hcl/scanner
-  - hcl/strconv
   - hcl/token
   - json/parser
+  - hcl/scanner
+  - hcl/strconv
   - json/scanner
   - json/token
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/kr/fs
-  version: 2788f0dbd16903de03cb8186e5c7d97b69ad387b
+  version: 74495d60ae285280941f802590cba0149369d33c
 - name: github.com/labstack/echo
-  version: 04e6901d05b58ddbae579a6252a3d1bb3f334adc
+  version: ""
   subpackages:
-  - context
   - engine
   - engine/standard
+  - context
   - log
 - name: github.com/labstack/gommon
-  version: 2d272df536d051e737aea353b86c979d6e88bce0
+  version: 74495d60ae285280941f802590cba0149369d33c
   subpackages:
-  - color
   - log
+  - color
 - name: github.com/layeh/gopher-json
   version: e45b65570c08a97b97a459e0cc04a53c1affab95
 - name: github.com/layeh/gopher-luar
@@ -61,34 +61,36 @@ imports:
   version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
 - name: github.com/mitchellh/mapstructure
   version: ca63d7c062ee3c9f34db231e352b60012b4fd0c1
+- name: github.com/newrelic/go-agent
+  version: 372845e16294c9fa73951b27d5631b601643fc51
 - name: github.com/onsi/gomega
   version: c90bd38f8da6e92f8b114953db2f0ad7361fb4b4
   subpackages:
-  - format
   - internal/assertion
   - internal/asyncassertion
-  - internal/oraclematcher
   - internal/testingtsupport
   - matchers
+  - types
+  - internal/oraclematcher
+  - format
   - matchers/support/goraph/bipartitegraph
   - matchers/support/goraph/edge
   - matchers/support/goraph/node
   - matchers/support/goraph/util
-  - types
 - name: github.com/op/go-logging
   version: 970db520ece77730c7e4724c61121037378659d9
 - name: github.com/pelletier/go-buffruneio
-  version: df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d
+  version: 74495d60ae285280941f802590cba0149369d33c
 - name: github.com/pelletier/go-toml
-  version: 5a62685873ef617233ab5f1b825a6e4a758e16cf
+  version: 74495d60ae285280941f802590cba0149369d33c
 - name: github.com/pkg/errors
-  version: 17b591df37844cde689f4d5813e5cea0927d8dd2
+  version: 74495d60ae285280941f802590cba0149369d33c
 - name: github.com/pkg/sftp
-  version: a71e8f580e3b622ebff585309160b1cc549ef4d2
+  version: 74495d60ae285280941f802590cba0149369d33c
 - name: github.com/satori/go.uuid
   version: 0aa62d5ddceb50dbcb909d790b5345affd3669b6
 - name: github.com/spf13/afero
-  version: 20500e2abd0d1f4564a499e83d11d6c73cd58c27
+  version: 74495d60ae285280941f802590cba0149369d33c
   subpackages:
   - mem
   - sftp
@@ -109,7 +111,7 @@ imports:
 - name: github.com/valyala/fasthttp
   version: 834fb48f10402a9c58ed0637ec47ba0d91f201c8
 - name: github.com/valyala/fasttemplate
-  version: 3b874956e03f1636d171bda64b130f9135f42cff
+  version: 74495d60ae285280941f802590cba0149369d33c
 - name: github.com/yuin/gopher-lua
   version: d0d5dd3565a9f3c86ff5bc42a0b1cc9e5bfcf55e
   subpackages:
@@ -119,11 +121,11 @@ imports:
 - name: golang.org/x/crypto
   version: 986d3313588aa5c68f1df95eac956f79cf3b2c01
   subpackages:
+  - pbkdf2
+  - ssh
   - curve25519
   - ed25519
   - ed25519/internal/edwards25519
-  - pbkdf2
-  - ssh
 - name: golang.org/x/net
   version: 7394c112eae4dba7e96bfcfe738e6373d61772b4
   subpackages:
@@ -135,7 +137,7 @@ imports:
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: d69c40b4be55797923cec7457fac7a244d91a9b6
+  version: 74495d60ae285280941f802590cba0149369d33c
   subpackages:
   - transform
   - unicode/norm
@@ -146,4 +148,4 @@ imports:
   - uritemplates
 - name: gopkg.in/yaml.v2
   version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
-testImports: []
+devImports: []

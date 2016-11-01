@@ -150,3 +150,36 @@ func NewSentryMiddleware(app *App) *SentryMiddleware {
 		App: app,
 	}
 }
+
+//NewNewRelicMiddleware returns the logger middleware
+func NewNewRelicMiddleware(app *App, theLogger zap.Logger) *NewRelicMiddleware {
+	l := &NewRelicMiddleware{App: app, Logger: theLogger}
+	return l
+}
+
+//NewRelicMiddleware is responsible for logging to Zap all requests
+type NewRelicMiddleware struct {
+	App    *App
+	Logger zap.Logger
+}
+
+// Serve serves the middleware
+func (nr *NewRelicMiddleware) Serve(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		route := c.Path()
+		txn := nr.App.NewRelic.StartTransaction(route, nil, nil)
+		c.Set("txn", txn)
+		defer func() {
+			c.Set("txn", nil)
+			txn.End()
+		}()
+
+		err := next(c)
+		if err != nil {
+			txn.NoticeError(err)
+			return err
+		}
+
+		return nil
+	}
+}
