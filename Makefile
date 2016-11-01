@@ -17,6 +17,7 @@ build:
 
 run-containers:
 	@cd test_containers && docker-compose up -d && cd ..
+	@/bin/bash -c "until docker exec testcontainers_elasticsearch_1 curl localhost:9200; do echo 'Waiting for Elasticsearch...' && sleep 1; done"
 
 kill-containers:
 	@cd test_containers && docker-compose stop && cd ..
