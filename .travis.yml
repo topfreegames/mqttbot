@@ -13,7 +13,6 @@ install:
 
 before_script:
   - make run-containers
-  - curl http://localhost:9123
   - make create-es-index-template
 
 script:
