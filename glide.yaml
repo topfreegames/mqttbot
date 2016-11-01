@@ -25,5 +25,4 @@ import:
 - package: github.com/uber-go/atomic
 - package: github.com/getsentry/raven-go
 - package: github.com/labstack/echo
-  version: ^2.0.2
 - package: github.com/newrelic/go-agent
