@@ -8,12 +8,21 @@ import (
 
 	"gopkg.in/olivere/elastic.v3"
 
+	"github.com/op/go-logging"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
 )
 
 var esclient *elastic.Client
 var once sync.Once
+
+type EsLogger struct {
+	Logger *logging.Logger
+}
+
+func (e *EsLogger) Printf(format string, v ...interface{}) {
+	e.Logger.Debugf(format, v)
+}
 
 // GetESClient returns the elasticsearch client with the given configs
 func GetESClient() *elastic.Client {
@@ -41,10 +50,12 @@ func configureESClient() {
 	client, err := elastic.NewClient(
 		elastic.SetURL(viper.GetString("elasticsearch.host")),
 		elastic.SetSniff(viper.GetBool("elasticsearch.sniff")),
+		elastic.SetTraceLog(&EsLogger{Logger: logger.Logger}),
 	)
 	if err != nil {
 		logger.Logger.Fatal(fmt.Sprintf("Failed to connect to elasticsearch! err: %v", err))
 	}
+
 	logger.Logger.Info(fmt.Sprintf("Successfully connected to elasticsearch @ %s",
 		viper.GetString("elasticsearch.host")))
 	logger.Logger.Debug("Creating index chat into ES")

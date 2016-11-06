@@ -104,18 +104,19 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 		if err != nil {
 			return err
 		}
+		logger.Logger.Debugf("Authenticating user with userID=%s and topic=%s", userID, topic)
 
 		redisResults := (r.([]interface{}))
 		if redisResults[0] != nil && redisResults[1] != nil {
 			boolQuery := elastic.NewBoolQuery()
-
-			termQuery := elastic.NewTermQuery("topic", topic)
+			matchQuery := elastic.NewMatchPhraseQuery("topic", topic)
 			rangeQuery := elastic.NewRangeQuery("timestamp").
 				From(since * 1000). // FIXME: The client should send time in milliseconds
 				To(nil).
 				IncludeLower(true).
 				IncludeUpper(true)
-			boolQuery.Must(rangeQuery, termQuery)
+			boolQuery.Must(matchQuery, rangeQuery)
+
 			var searchResults *elastic.SearchResult
 			err = WithSegment("elasticsearch", c, func() error {
 				searchResults, err = esclient.Search().Index("chat").Query(boolQuery).
