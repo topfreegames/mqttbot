@@ -32,12 +32,8 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 		from, err := strconv.Atoi(c.QueryParam("from"))
 		limit, err := strconv.Atoi(c.QueryParam("limit"))
 
-		defaultLimit := 10
-		if limitFromEnv := os.Getenv("HISTORY_LIMIT"); limitFromEnv != "" {
-			defaultLimit, err = strconv.Atoi(limitFromEnv)
-		}
 		if limit == 0 {
-			limit = defaultLimit
+			limit = 10
 		}
 
 		logger.Logger.Debugf("user %s is asking for history for topic %s with args from=%d and limit=%d", userID, topic, from, limit)
@@ -46,27 +42,19 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 		rc.Send("MULTI")
 		rc.Send("GET", userID)
 		rc.Send("GET", fmt.Sprintf("%s-%s", userID, topic))
-		var r interface{}
-		err = WithSegment("redis", c, func() error {
-			r, err = rc.Do("EXEC")
-			return err
-		})
+		r, err := rc.Do("EXEC")
 		if err != nil {
 			return err
 		}
 		redisResults := (r.([]interface{}))
 		if redisResults[0] != nil && redisResults[1] != nil {
 			boolQuery := elastic.NewBoolQuery()
+			// FIXME: Dont think this is the best way for searching
+			matchTopicQuery := elastic.NewMatchQuery("topic", topic).MinimumShouldMatch("100%")
+			boolQuery.Filter(matchTopicQuery)
 
-			termQuery := elastic.NewTermQuery("topic", topic)
-			boolQuery.Must(termQuery)
-
-			var searchResults *elastic.SearchResult
-			err = WithSegment("elasticsearch", c, func() error {
-				searchResults, err = esclient.Search().Index("chat").Query(boolQuery).
-					Sort("timestamp", false).From(from).Size(limit).Do()
-				return err
-			})
+			searchResults, err := esclient.Search().Index("chat").Query(boolQuery).
+				Sort("timestamp", false).From(from).Size(limit).Do()
 			if err != nil {
 				return err
 			}
@@ -77,25 +65,8 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 					messages = append(messages, t)
 				}
 			}
-			var resStr []byte
-			err = WithSegment("response-serialize", c, func() error {
-				resStr, err = json.Marshal(messages)
-				return err
-			})
-			if err != nil {
-				return err
-			}
-
-			logger.Logger.Debugf(
-				"responded to user %s history for topic %s with args from=%d and limit=%d with code=%d and message=%s",
-				userID, topic, from, limit, http.StatusOK, string(resStr),
-			)
 			return c.JSON(http.StatusOK, messages)
 		}
-		logger.Logger.Debugf(
-			"responded to user %s history for topic %s with args from=%d and limit=%d with code=%d and message=%s",
-			userID, topic, from, limit, echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message,
-		)
 		return c.String(echo.ErrUnauthorized.Code, echo.ErrUnauthorized.Message)
 	}
 }
