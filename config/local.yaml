@@ -9,6 +9,11 @@ mqttserver:
   usetls: false
   insecure_tls: true
   subscriptionRequests:
+    - topic: 'chat/+/room/+/donations'
+      qos: 2
+      plugins:
+        - plugin: "persist_message"
+          messagePattern: ".*"
     - topic: 'chat/+/room/+'
       qos: 2
       plugins:
