@@ -21,4 +21,4 @@ script:
 
 after_success:
   - ./push_to_docker.sh
-  - curl $TEST_FARM_URL
+  - curl -XPOST "$TEST_FARM_URL"
