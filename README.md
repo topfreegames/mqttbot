@@ -6,7 +6,6 @@
 A utility bot for MQTT-based chat services. MqttBot is implemented in Go with
 support to Lua plugins.
 
-
 ## Features
 
 MqttBot is an extensible MqttBot developed in Go with support for Lua plugins.
