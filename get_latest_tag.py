@@ -6,7 +6,12 @@
 
 import urllib
 import urllib2
+import re
 import json
+
+
+REMOVE_LETTERS = re.compile('[a-zA-Z]+')
+
 
 def main():
     url = "https://auth.docker.io/token?service=registry.docker.io&scope=repository:tfgco/mqttbot:pull,push"
@@ -29,6 +34,9 @@ def get_tag_value(tag):
 
     total_value = 0
     for index, tag_part in enumerate(tag):
+        tag_part = REMOVE_LETTERS.sub('', tag_part)
+        if not tag_part:
+            tag_part = 0
         power = pow(100, len(tag) - index)
         total_value += int(tag_part) * power
 
