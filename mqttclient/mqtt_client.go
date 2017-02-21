@@ -9,36 +9,66 @@ import (
 	"time"
 
 	"github.com/eclipse/paho.mqtt.golang"
+	uuid "github.com/satori/go.uuid"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
 )
 
-// MqttClient contains the data needed to connect the client
-type MqttClient struct {
-	MqttServerHost string
-	MqttServerPort int
-	MqttClient     mqtt.Client
+// MQTTClient contains the data needed to connect the client
+type MQTTClient struct {
+	MQTTServerHost   string
+	MQTTServerPort   int
+	MQTTClient       mqtt.Client
+	Heartbeat        *Heartbeat
+	OnConnectHandler mqtt.OnConnectHandler
 }
 
-var client *MqttClient
+var client *MQTTClient
 var once sync.Once
 
-// GetMqttClient creates the mqttclient and returns it
-func GetMqttClient(onConnectHandler mqtt.OnConnectHandler) *MqttClient {
+//ResetMQTTClient resets once
+func ResetMQTTClient() {
+	once = sync.Once{}
+	client = nil
+}
+
+// GetMQTTClient creates the mqttclient and returns it
+func GetMQTTClient(onConnectHandler mqtt.OnConnectHandler) *MQTTClient {
 	once.Do(func() {
-		client = &MqttClient{}
+		client = &MQTTClient{}
 		client.configure(onConnectHandler)
 	})
 	return client
 }
 
-func (mc *MqttClient) configure(onConnectHandler mqtt.OnConnectHandler) {
-	mc.setConfigurationDefaults()
-	mc.configureClient()
-	mc.start(onConnectHandler)
+func (mc *MQTTClient) hasConnected(client mqtt.Client) {
+	if mc.OnConnectHandler != nil {
+		mc.OnConnectHandler(client)
+	}
+
+	mc.Heartbeat = &Heartbeat{
+		Topic:             uuid.NewV4().String(),
+		Client:            mc,
+		OnHeartbeatMissed: mc.onHeartbeatMissed,
+	}
+	mc.Heartbeat.Start()
 }
 
-func (mc *MqttClient) setConfigurationDefaults() {
+func (mc *MQTTClient) configure(onConnectHandler mqtt.OnConnectHandler) {
+	mc.OnConnectHandler = onConnectHandler
+	mc.setConfigurationDefaults()
+	mc.configureClient()
+	mc.start()
+}
+
+func (mc *MQTTClient) onHeartbeatMissed(err error) {
+	if mc.MQTTClient.IsConnected() {
+		mc.MQTTClient.Disconnect(0)
+	}
+	mc.start()
+}
+
+func (mc *MQTTClient) setConfigurationDefaults() {
 	viper.SetDefault("mqttserver.host", "localhost")
 	viper.SetDefault("mqttserver.port", 1883)
 	viper.SetDefault("mqttserver.user", "admin")
@@ -47,23 +77,25 @@ func (mc *MqttClient) setConfigurationDefaults() {
 	viper.SetDefault("mqttserver.ca_cert_file", "")
 }
 
-func (mc *MqttClient) configureClient() {
-	mc.MqttServerHost = viper.GetString("mqttserver.host")
-	mc.MqttServerPort = viper.GetInt("mqttserver.port")
+func (mc *MQTTClient) configureClient() {
+	mc.MQTTServerHost = viper.GetString("mqttserver.host")
+	mc.MQTTServerPort = viper.GetInt("mqttserver.port")
 }
 
-func (mc *MqttClient) start(onConnectHandler mqtt.OnConnectHandler) {
+func (mc *MQTTClient) start() {
 	logger.Logger.Debug("Initializing mqtt client")
 
-	useTls := viper.GetBool("mqttserver.usetls")
+	useTLS := viper.GetBool("mqttserver.usetls")
 	protocol := "tcp"
-	if useTls {
+	if useTLS {
 		protocol = "ssl"
 	}
 
-	opts := mqtt.NewClientOptions().AddBroker(fmt.Sprintf("%s://%s:%d", protocol, mc.MqttServerHost, mc.MqttServerPort)).SetClientID("mqttbot")
+	opts := mqtt.NewClientOptions().AddBroker(
+		fmt.Sprintf("%s://%s:%d", protocol, mc.MQTTServerHost, mc.MQTTServerPort),
+	).SetClientID("mqttbot")
 
-	if useTls {
+	if useTLS {
 		logger.Logger.Info("mqttclient using tls")
 		certpool := x509.NewCertPool()
 		if viper.GetString("mqttserver.ca_cert_file") != "" {
@@ -74,7 +106,11 @@ func (mc *MqttClient) start(onConnectHandler mqtt.OnConnectHandler) {
 				logger.Logger.Error(err.Error())
 			}
 		}
-		tlsConfig := &tls.Config{InsecureSkipVerify: viper.GetBool("mqttserver.insecure_tls"), ClientAuth: tls.NoClientCert, RootCAs: certpool}
+		tlsConfig := &tls.Config{
+			InsecureSkipVerify: viper.GetBool("mqttserver.insecure_tls"),
+			ClientAuth:         tls.NoClientCert,
+			RootCAs:            certpool,
+		}
 		opts.SetTLSConfig(tlsConfig)
 	}
 
@@ -83,15 +119,18 @@ func (mc *MqttClient) start(onConnectHandler mqtt.OnConnectHandler) {
 	opts.SetKeepAlive(3 * time.Second)
 	opts.SetPingTimeout(5 * time.Second)
 	opts.SetMaxReconnectInterval(30 * time.Second)
-	opts.SetOnConnectHandler(onConnectHandler)
-	mc.MqttClient = mqtt.NewClient(opts)
+	opts.SetOnConnectHandler(mc.hasConnected)
+	opts.SetAutoReconnect(false)
+	mc.MQTTClient = mqtt.NewClient(opts)
 
-	c := mc.MqttClient
+	c := mc.MQTTClient
 
 	if token := c.Connect(); token.Wait() && token.Error() != nil {
 		logger.Logger.Fatal(token.Error())
 	}
 
-	logger.Logger.Info(fmt.Sprintf("Successfully connected to mqtt server at %s:%d!",
-		mc.MqttServerHost, mc.MqttServerPort))
+	logger.Logger.Info(fmt.Sprintf(
+		"Successfully connected to mqtt server at %s:%d!",
+		mc.MQTTServerHost, mc.MQTTServerPort,
+	))
 }

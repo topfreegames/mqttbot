@@ -45,7 +45,7 @@ func (p *Plugins) preloadModules() {
 
 func (p *Plugins) loadModules(L *lua.LState) {
 	L.PreloadModule("persistence_module", modules.PersistenceModuleLoader)
-	L.PreloadModule("mqttclient_module", modules.MqttClientModuleLoader)
+	L.PreloadModule("mqttclient_module", modules.MQTTClientModuleLoader)
 	L.PreloadModule("redis_module", modules.RedisModuleLoader)
 	L.PreloadModule("http", gluahttp.NewHttpModule(&http.Client{}).Loader)
 	L.PreloadModule("json", json.Loader)

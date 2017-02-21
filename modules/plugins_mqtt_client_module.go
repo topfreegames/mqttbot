@@ -11,9 +11,9 @@ import (
 
 var mqttClient mqtt.Client
 
-// MqttClientModuleLoader loads the module and prepares it
-func MqttClientModuleLoader(L *lua.LState) int {
-	configureMqttModule()
+// MQTTClientModuleLoader loads the module and prepares it
+func MQTTClientModuleLoader(L *lua.LState) int {
+	configureMQTTModule()
 	mod := L.SetFuncs(L.NewTable(), mqttClientModuleExports)
 	L.Push(mod)
 	return 1
@@ -23,8 +23,8 @@ var mqttClientModuleExports = map[string]lua.LGFunction{
 	"send_message": SendMessage,
 }
 
-func configureMqttModule() {
-	mqttClient = mqttclient.GetMqttClient(nil).MqttClient
+func configureMQTTModule() {
+	mqttClient = mqttclient.GetMQTTClient(nil).MQTTClient
 }
 
 // SendMessage sends message to mqtt

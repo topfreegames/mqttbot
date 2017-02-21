@@ -28,15 +28,15 @@ type Subscription struct {
 	PluginMappings []*PluginMapping
 }
 
-// MqttBot defines the bot, it contains plugins, subscriptions and a client
-type MqttBot struct {
+// MQTTBot defines the bot, it contains plugins, subscriptions and a client
+type MQTTBot struct {
 	Plugins       *plugins.Plugins
 	Subscriptions []*Subscription
-	Client        *mqttclient.MqttClient
+	Client        *mqttclient.MQTTClient
 	Config        *viper.Viper
 }
 
-var mqttBot *MqttBot
+var mqttBot *MQTTBot
 var once sync.Once
 
 var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -52,18 +52,24 @@ var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	}
 }
 
-// GetMqttBot returns a initialized mqtt bot
-func GetMqttBot() *MqttBot {
+//ResetMQTTBot clears once and mqttbot instance
+func ResetMQTTBot() {
+	once = sync.Once{}
+	mqttBot = nil
+}
+
+// GetMQTTBot returns a initialized mqtt bot
+func GetMQTTBot() *MQTTBot {
 	once.Do(func() {
 		addCredentialsToRedis()
-		mqttBot = &MqttBot{}
-		mqttBot.Client = mqttclient.GetMqttClient(onClientConnectHandler)
+		mqttBot = &MQTTBot{}
+		mqttBot.Client = mqttclient.GetMQTTClient(onClientConnectHandler)
 		mqttBot.setupPlugins()
 	})
 	return mqttBot
 }
 
-func (b *MqttBot) setupPlugins() {
+func (b *MQTTBot) setupPlugins() {
 	b.Plugins = plugins.GetPlugins()
 	b.Plugins.SetupPlugins()
 }
@@ -74,9 +80,10 @@ var onClientConnectHandler = func(client mqtt.Client) {
 
 // StartBot starts the bot, it subscribes the bot to the topics defined in the
 // configuration file
-func (b *MqttBot) StartBot() {
+func (b *MQTTBot) StartBot() {
 	subscriptions := viper.Get("mqttserver.subscriptionRequests").([]interface{})
-	client := b.Client.MqttClient
+	client := b.Client.MQTTClient
+	fmt.Println(12)
 	b.Subscriptions = []*Subscription{}
 	for _, s := range subscriptions {
 		sMap := s.(map[interface{}]interface{})

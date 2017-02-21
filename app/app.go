@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/getsentry/raven-go"
+	raven "github.com/getsentry/raven-go"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine"
 	"github.com/labstack/echo/engine/standard"
@@ -30,7 +30,7 @@ type App struct {
 	Host        string
 	API         *echo.Echo
 	Engine      engine.Server
-	MqttBot     *bot.MqttBot
+	MQTTBot     *bot.MQTTBot
 	RedisClient *redisclient.RedisClient
 	NewRelic    newrelic.Application
 }
@@ -98,7 +98,7 @@ func (app *App) configureSentry() {
 }
 
 func (app *App) configureApplication() {
-	app.MqttBot = bot.GetMqttBot()
+	app.MQTTBot = bot.GetMQTTBot()
 	app.Engine = standard.New(fmt.Sprintf("%s:%d", app.Host, app.Port))
 	app.API = echo.New()
 	a := app.API
