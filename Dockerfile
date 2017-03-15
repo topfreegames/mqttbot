@@ -2,8 +2,7 @@ FROM golang:1.6.2-alpine
 
 MAINTAINER TFG Co <backend@tfgco.com>
 
-RUN apk update
-RUN apk add git bash
+RUN apk add --no-cache git bash
 
 RUN go get -u github.com/Masterminds/glide/...
 
