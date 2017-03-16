@@ -6,8 +6,7 @@ setup:
 	@glide install
 
 setup-ci:
-	@sudo add-apt-repository -y ppa:masterminds/glide && sudo apt-get update
-	@sudo apt-get install -y glide
+	@go get -v github.com/Masterminds/glide
 	@go get github.com/mattn/goveralls
 	@glide install
 
