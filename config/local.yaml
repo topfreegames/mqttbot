@@ -24,6 +24,11 @@ mqttserver:
       plugins:
         - plugin: "persist_message"
           messagePattern: ".*"
+    - topic: 'chat/+/room/+/replays'
+      qos: 2
+      plugins:
+        - plugin: "persist_message"
+          messagePattern: ".*"
     - topic: 'chat/+/room/+/battles/results'
       qos: 2
       plugins:
