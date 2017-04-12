@@ -2,7 +2,7 @@ FROM golang:1.6.2-alpine
 
 MAINTAINER TFG Co <backend@tfgco.com>
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git curl jq
 
 RUN go get -u github.com/Masterminds/glide/...
 
