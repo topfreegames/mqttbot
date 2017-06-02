@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/topfreegames/mqttbot/es"
 	"github.com/topfreegames/mqttbot/logger"
-	"gopkg.in/olivere/elastic.v3"
+	"gopkg.in/olivere/elastic.v5"
 )
 
 // Message represents a chat message
@@ -54,7 +55,7 @@ func HistoryHandler(app *App) func(c echo.Context) error {
 			boolQuery.Filter(matchTopicQuery)
 
 			searchResults, err := esclient.Search().Index("chat").Query(boolQuery).
-				Sort("timestamp", false).From(from).Size(limit).Do()
+				Sort("timestamp", false).From(from).Size(limit).Do(context.TODO())
 			if err != nil {
 				return err
 			}
@@ -120,7 +121,7 @@ func HistorySinceHandler(app *App) func(c echo.Context) error {
 			var searchResults *elastic.SearchResult
 			err = WithSegment("elasticsearch", c, func() error {
 				searchResults, err = esclient.Search().Index("chat").Query(boolQuery).
-					Sort("timestamp", false).From(from).Size(limit).Do()
+					Sort("timestamp", false).From(from).Size(limit).Do(context.TODO())
 				return err
 			})
 

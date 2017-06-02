@@ -1,5 +1,5 @@
-hash: e78be4f3be5bdec6d2a4ffbcb7ef516c06c5e1db2103ecb007f147f9a065829d
-updated: 2016-11-01T11:33:30.787713559-02:00
+hash: 90b40261e25a7e6f9b53ee77441d32bbaf49d345b8ff8f0b65b9bc7c425863b7
+updated: 2017-06-02T16:45:47.863720164-03:00
 imports:
 - name: github.com/ajg/form
   version: 523a5da1a92f01b01f840b61689c0340a0243532
@@ -152,6 +152,8 @@ imports:
   subpackages:
   - backoff
   - uritemplates
+- name: gopkg.in/olivere/elastic.v5
+  version: f1fd7305d0b6270192b27010fe1193568b18e4b6
 - name: gopkg.in/yaml.v2
   version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
 testImports: []

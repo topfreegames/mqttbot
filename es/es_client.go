@@ -1,12 +1,13 @@
 package es
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
 	"sync"
 
-	"gopkg.in/olivere/elastic.v3"
+	"gopkg.in/olivere/elastic.v5"
 
 	"github.com/op/go-logging"
 	"github.com/spf13/viper"
@@ -62,7 +63,7 @@ func configureESClient() {
 
 	indexes := viper.GetStringMapString("elasticsearch.indexMappings")
 	for index, mappings := range indexes {
-		_, err = client.CreateIndex(index).Body(mappings).Do()
+		_, err = client.CreateIndex(index).Body(mappings).Do(context.TODO())
 		if err != nil {
 			if strings.Contains(err.Error(), "index_already_exists_exception") || strings.Contains(err.Error(), "IndexAlreadyExistsException") ||
 				strings.Contains(err.Error(), "already exists as alias") {

@@ -8,6 +8,7 @@ package app_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -70,7 +71,7 @@ func TestHistoryHandler(t *testing.T) {
 					Payload:   "{\"test1\":\"test2\"}",
 					Topic:     topic,
 				}
-				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do()
+				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do(context.TODO())
 				Expect(err).To(BeNil())
 
 				refreshIndex()
@@ -130,7 +131,7 @@ func TestHistoryHandler(t *testing.T) {
 					Topic:     topic,
 				}
 
-				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do()
+				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do(context.TODO())
 				Expect(err).To(BeNil())
 
 				refreshIndex()
@@ -186,7 +187,7 @@ func TestHistoryHandler(t *testing.T) {
 					"/historysince/%s?userid=test:test&since=%d",
 					topic, (time.Now().UnixNano() / 1000000000), // now
 				)
-				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do()
+				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do(context.TODO())
 				Expect(err).To(BeNil())
 
 				// Update indexes
@@ -227,7 +228,7 @@ func TestHistoryHandler(t *testing.T) {
 						Payload:   "{\"test1\":\"test2\"}",
 						Topic:     topic,
 					}
-					_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do()
+					_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do(context.TODO())
 					Expect(err).To(BeNil())
 				}
 
@@ -273,7 +274,7 @@ func TestHistoryHandler(t *testing.T) {
 					Payload:   "{\"test1\":\"test2\"}",
 					Topic:     topic,
 				}
-				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do()
+				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do(context.TODO())
 				Expect(err).To(BeNil())
 			}
 
@@ -321,7 +322,7 @@ func TestHistoryHandler(t *testing.T) {
 					Payload:   "{\"test1\":\"test2\"}",
 					Topic:     topic,
 				}
-				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do()
+				_, err = esclient.Index().Index("chat").Type("message").BodyJson(testMessage).Do(context.TODO())
 				Expect(err).To(BeNil())
 			}
 

@@ -1,11 +1,12 @@
 package modules
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"time"
 
-	"gopkg.in/olivere/elastic.v3"
+	"gopkg.in/olivere/elastic.v5"
 
 	"github.com/layeh/gopher-luar"
 	"github.com/topfreegames/mqttbot/es"
@@ -45,7 +46,7 @@ func IndexMessage(L *lua.LState) int {
 	message.Timestamp = time.Now()
 	message.Payload = payload.String()
 	message.Topic = topic.String()
-	if _, err := esclient.Index().Index("chat").Type("message").BodyJson(message).Do(); err != nil {
+	if _, err := esclient.Index().Index("chat").Type("message").BodyJson(message).Do(context.TODO()); err != nil {
 		L.Push(lua.LString(fmt.Sprintf("%s", err)))
 		L.Push(L.ToNumber(1))
 		return 2
@@ -66,7 +67,7 @@ func QueryMessages(L *lua.LState) int {
 	termQuery := elastic.NewQueryStringQuery(fmt.Sprintf("topic:\"%s\"", topic.String()))
 	searchResults, err := esclient.Search().Index("chat").Query(termQuery).
 		Sort("timestamp", false).From(int(lua.LVAsNumber(start))).
-		Size(int(lua.LVAsNumber(limit))).Do()
+		Size(int(lua.LVAsNumber(limit))).Do(context.TODO())
 	if err != nil {
 		L.Push(lua.LString(fmt.Sprintf("%s", err)))
 		L.Push(L.ToNumber(1))
