@@ -63,7 +63,7 @@ elasticsearch:
   host: "http://localhost:9123"
   sniff: false
   indexMappings:
-    chat: '{ "mappings": { "message":{"_ttl": { "enabled": true, "default": "2d" }}}}'
+    chat: '{ "mappings": { "message":{}}}'
 redis:
   host: "localhost"
   port: 4444
