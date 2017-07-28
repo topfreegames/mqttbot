@@ -20,11 +20,11 @@ import:
 - package: github.com/gavv/httpexpect
 - package: github.com/ajg/form
 - package: github.com/valyala/fasthttp
-- package: gopkg.in/olivere/elastic.v3
-- package: github.com/uber-go/zap
-- package: github.com/uber-go/atomic
+  version: ^20160617.0.0
+- package: github.com/sirupsen/logrus
 - package: github.com/getsentry/raven-go
 - package: github.com/labstack/echo
+  version: v3.2.1
 - package: github.com/newrelic/go-agent
 - package: gopkg.in/olivere/elastic.v5
   version: ^5.0.39

@@ -16,7 +16,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/labstack/echo/engine/standard"
 	"github.com/onsi/gomega"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/app"
@@ -57,8 +56,8 @@ func GetWithQuery(app *App, url string, queryKey string, queryValue string, t *t
 */
 
 func doRequest(app *app.App, method, url, body string) (int, string) {
-	app.Engine.SetHandler(app.API)
-	ts := httptest.NewServer(app.Engine.(*standard.Server))
+	// app.Engine.SetHandler(app.API)
+	ts := httptest.NewServer(app.API)
 	defer ts.Close()
 
 	var reader io.Reader

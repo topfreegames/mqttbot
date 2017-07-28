@@ -13,14 +13,12 @@ import (
 
 	raven "github.com/getsentry/raven-go"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine"
-	"github.com/labstack/echo/engine/standard"
 	newrelic "github.com/newrelic/go-agent"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/bot"
 	"github.com/topfreegames/mqttbot/logger"
 	"github.com/topfreegames/mqttbot/redisclient"
-	"github.com/uber-go/zap"
 )
 
 // App is the struct that defines the application
@@ -29,7 +27,6 @@ type App struct {
 	Port        int
 	Host        string
 	API         *echo.Echo
-	Engine      engine.Server
 	MQTTBot     *bot.MQTTBot
 	RedisClient *redisclient.RedisClient
 	NewRelic    newrelic.Application
@@ -69,7 +66,7 @@ func (app *App) configureNewRelic() {
 	}
 	nr, err := newrelic.NewApplication(config)
 	if err != nil {
-		logger.Logger.Error("Failed to initialize New Relic.", zap.Error(err))
+		logger.Logger.Error("Failed to initialize New Relic.", err)
 		panic(fmt.Sprintf("Could not initialize New Relic, err: %s", err))
 	}
 
@@ -99,26 +96,22 @@ func (app *App) configureSentry() {
 
 func (app *App) configureApplication() {
 	app.MQTTBot = bot.GetMQTTBot()
-	app.Engine = standard.New(fmt.Sprintf("%s:%d", app.Host, app.Port))
+
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+
+	contextLogger := log.WithField("source", "app")
+
 	app.API = echo.New()
 	a := app.API
-	_, w, _ := os.Pipe()
-	a.SetLogOutput(w)
-	a.Use(NewLoggerMiddleware(zap.New(
-		zap.NewJSONEncoder(),
-	)).Serve)
+	a.Use(NewLoggerMiddleware(contextLogger).Serve)
 	a.Use(NewSentryMiddleware(app).Serve)
 	a.Use(VersionMiddleware)
 	a.Use(NewRecoveryMiddleware(app.OnErrorHandler).Serve)
-	a.Use(NewNewRelicMiddleware(app, zap.New(
-		zap.NewJSONEncoder(),
-	)).Serve)
+	a.Use(NewNewRelicMiddleware(app, contextLogger).Serve)
 
 	// Routes
-	a.Get("/healthcheck", HealthCheckHandler(app))
-	a.Get("/historysince/*", HistorySinceHandler(app))
-	a.Get("/history/*", HistoryHandler(app))
-	a.Get("/:other", NotFoundHandler(app))
+	a.GET("/healthcheck", HealthCheckHandler(app))
 
 	app.RedisClient = redisclient.GetRedisClient(viper.GetString("redis.host"), viper.GetInt("redis.port"), viper.GetString("redis.password"))
 }
@@ -144,5 +137,8 @@ func (app *App) OnErrorHandler(err interface{}, stack []byte) {
 
 // Start starts the application
 func (app *App) Start() {
-	app.API.Run(app.Engine)
+	err := app.API.Start(fmt.Sprintf("%s:%d", app.Host, app.Port))
+	if err != nil {
+		log.WithError(err).Error("App failed to start.")
+	}
 }

@@ -7,7 +7,7 @@ import (
 
 	"github.com/getsentry/raven-go"
 	"github.com/labstack/echo"
-	"github.com/uber-go/zap"
+	log "github.com/sirupsen/logrus"
 )
 
 //VersionMiddleware automatically adds a version header to response
@@ -53,15 +53,13 @@ func (r RecoveryMiddleware) Serve(next echo.HandlerFunc) echo.HandlerFunc {
 
 //LoggerMiddleware is responsible for logging to Zap all requests
 type LoggerMiddleware struct {
-	Logger zap.Logger
+	Logger log.FieldLogger
 }
 
 // Serve serves the middleware
 func (l LoggerMiddleware) Serve(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		log := l.Logger.With(
-			zap.String("source", "request"),
-		)
+		lg := l.Logger.WithField("source", "request")
 
 		//all except latency to string
 		var ip, method, path string
@@ -70,7 +68,7 @@ func (l LoggerMiddleware) Serve(next echo.HandlerFunc) echo.HandlerFunc {
 		var startTime, endTime time.Time
 
 		path = c.Path()
-		method = c.Request().Method()
+		method = c.Request().Method
 
 		startTime = time.Now()
 
@@ -80,24 +78,24 @@ func (l LoggerMiddleware) Serve(next echo.HandlerFunc) echo.HandlerFunc {
 		endTime = time.Now()
 		latency = endTime.Sub(startTime)
 
-		status = c.Response().Status()
-		ip = c.Request().RemoteAddress()
+		status = c.Response().Status
+		ip = c.Request().RemoteAddr
 
 		route := c.Get("route")
 		if route == nil {
-			log.Debug("Route does not have route set in ctx")
+			lg.Debug("Route does not have route set in ctx")
 			return result
 		}
 
-		reqLog := log.With(
-			zap.String("route", route.(string)),
-			zap.Time("endTime", endTime),
-			zap.Int("statusCode", status),
-			zap.Duration("latency", latency),
-			zap.String("ip", ip),
-			zap.String("method", method),
-			zap.String("path", path),
-		)
+		reqLog := lg.WithFields(log.Fields{
+			"route":      route.(string),
+			"endTime":    endTime,
+			"statusCode": status,
+			"latency":    latency,
+			"ip":         ip,
+			"method":     method,
+			"path":       path,
+		})
 
 		//request failed
 		if status > 399 && status < 500 {
@@ -117,7 +115,7 @@ func (l LoggerMiddleware) Serve(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 // NewLoggerMiddleware returns the logger middleware
-func NewLoggerMiddleware(theLogger zap.Logger) *LoggerMiddleware {
+func NewLoggerMiddleware(theLogger log.FieldLogger) *LoggerMiddleware {
 	l := &LoggerMiddleware{Logger: theLogger}
 	return l
 }
@@ -135,8 +133,8 @@ func (s SentryMiddleware) Serve(next echo.HandlerFunc) echo.HandlerFunc {
 			tags := map[string]string{
 				"source": "app",
 				"type":   "Internal server error",
-				"url":    c.Request().URI(),
-				"status": fmt.Sprintf("%d", c.Response().Status()),
+				"url":    c.Request().URL.String(),
+				"status": fmt.Sprintf("%d", c.Response().Status),
 			}
 			raven.CaptureError(err, tags)
 		}
@@ -152,7 +150,7 @@ func NewSentryMiddleware(app *App) *SentryMiddleware {
 }
 
 //NewNewRelicMiddleware returns the logger middleware
-func NewNewRelicMiddleware(app *App, theLogger zap.Logger) *NewRelicMiddleware {
+func NewNewRelicMiddleware(app *App, theLogger log.FieldLogger) *NewRelicMiddleware {
 	l := &NewRelicMiddleware{App: app, Logger: theLogger}
 	return l
 }
@@ -160,7 +158,7 @@ func NewNewRelicMiddleware(app *App, theLogger zap.Logger) *NewRelicMiddleware {
 //NewRelicMiddleware is responsible for logging to Zap all requests
 type NewRelicMiddleware struct {
 	App    *App
-	Logger zap.Logger
+	Logger log.FieldLogger
 }
 
 // Serve serves the middleware
