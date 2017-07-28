@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/garyburd/redigo/redis"
@@ -40,6 +41,9 @@ var mqttBot *MQTTBot
 var once sync.Once
 
 var h mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+	if msg.Duplicate() {
+		logger.Logger.Warning("duplicated message")
+	}
 	for _, subscription := range mqttBot.Subscriptions {
 		if RouteIncludesTopic(strings.Split(subscription.Topic, "/"), strings.Split(msg.Topic(), "/")) {
 			for _, pluginMapping := range subscription.PluginMappings {
@@ -103,12 +107,9 @@ func (b *MQTTBot) StartBot() {
 			})
 		}
 
-		for i := 0; i < 10; i++ {
-			if tokenUnsubscribe := client.Unsubscribe(topic); tokenUnsubscribe.Wait() && tokenUnsubscribe.Error() != nil {
-				logger.Logger.Info(tokenUnsubscribe.Error())
-			}
+		if tokenUnsubscribe := client.Unsubscribe(topic); tokenUnsubscribe.WaitTimeout(5*time.Second) && tokenUnsubscribe.Error() != nil {
+			logger.Logger.Info(tokenUnsubscribe.Error())
 		}
-
 		if token := client.Subscribe(topic, uint8(qos), h); token.Wait() && token.Error() != nil {
 			logger.Logger.Fatal(token.Error())
 		}
