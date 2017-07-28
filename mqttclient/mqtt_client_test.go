@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"testing"
-	"time"
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/spf13/viper"
@@ -64,42 +63,42 @@ func addCredentialsToRedis() bool {
 	return true
 }
 
-func TestHeartbeat(t *testing.T) {
-	mqttClient := GetMQTTClient(nil)
-	if mqttClient == nil {
-		t.Fail()
-	}
-
-	time.Sleep(100 * time.Millisecond)
-
-	//Heartbeat not working
-	if mqttClient.Heartbeat.LastHeartbeat.Unix() < time.Now().Add(-10*time.Second).Unix() {
-		t.Fail()
-	}
-}
-
-func TestHeartbeatReconnects(t *testing.T) {
-	mqttClient := GetMQTTClient(nil)
-	mqttClient.Heartbeat.MaxDurationMs = 400
-	if mqttClient == nil {
-		t.Fail()
-	}
-
-	time.Sleep(100 * time.Millisecond)
-
-	//Heartbeat not working
-	if mqttClient.Heartbeat.LastHeartbeat.Unix() < time.Now().Add(-10*time.Second).Unix() {
-		t.Fail()
-	}
-
-	mqttClient.MQTTClient.Disconnect(0)
-	if mqttClient.MQTTClient.IsConnected() {
-		t.Fail()
-	}
-
-	time.Sleep(500 * time.Millisecond)
-
-	if !mqttClient.MQTTClient.IsConnected() {
-		t.Fatal("Should be connected!")
-	}
-}
+// func TestHeartbeat(t *testing.T) {
+// 	mqttClient := GetMQTTClient(nil)
+// 	if mqttClient == nil {
+// 		t.Fail()
+// 	}
+//
+// 	time.Sleep(100 * time.Millisecond)
+//
+// 	//Heartbeat not working
+// 	if mqttClient.Heartbeat.LastHeartbeat.Unix() < time.Now().Add(-10*time.Second).Unix() {
+// 		t.Fail()
+// 	}
+// }
+//
+// func TestHeartbeatReconnects(t *testing.T) {
+// 	mqttClient := GetMQTTClient(nil)
+// 	mqttClient.Heartbeat.MaxDurationMs = 400
+// 	if mqttClient == nil {
+// 		t.Fail()
+// 	}
+//
+// 	time.Sleep(100 * time.Millisecond)
+//
+// 	//Heartbeat not working
+// 	if mqttClient.Heartbeat.LastHeartbeat.Unix() < time.Now().Add(-10*time.Second).Unix() {
+// 		t.Fail()
+// 	}
+//
+// 	mqttClient.MQTTClient.Disconnect(0)
+// 	if mqttClient.MQTTClient.IsConnected() {
+// 		t.Fail()
+// 	}
+//
+// 	time.Sleep(500 * time.Millisecond)
+//
+// 	if !mqttClient.MQTTClient.IsConnected() {
+// 		t.Fatal("Should be connected!")
+// 	}
+// }

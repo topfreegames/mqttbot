@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/eclipse/paho.mqtt.golang"
-	uuid "github.com/satori/go.uuid"
 	"github.com/spf13/viper"
 	"github.com/topfreegames/mqttbot/logger"
 )
@@ -46,12 +45,12 @@ func (mc *MQTTClient) hasConnected(client mqtt.Client) {
 		mc.OnConnectHandler(client)
 	}
 
-	mc.Heartbeat = &Heartbeat{
-		Topic:             uuid.NewV4().String(),
-		Client:            mc,
-		OnHeartbeatMissed: mc.onHeartbeatMissed,
-	}
-	mc.Heartbeat.Start()
+	// mc.Heartbeat = &Heartbeat{
+	// 	Topic:             uuid.NewV4().String(),
+	// 	Client:            mc,
+	// 	OnHeartbeatMissed: mc.onHeartbeatMissed,
+	// }
+	// mc.Heartbeat.Start()
 }
 
 func (mc *MQTTClient) configure(onConnectHandler mqtt.OnConnectHandler) {
@@ -61,12 +60,15 @@ func (mc *MQTTClient) configure(onConnectHandler mqtt.OnConnectHandler) {
 	mc.start()
 }
 
-func (mc *MQTTClient) onHeartbeatMissed(err error) {
-	if mc.MQTTClient.IsConnected() {
-		mc.MQTTClient.Disconnect(0)
-	}
-	mc.start()
-}
+// func (mc *MQTTClient) onHeartbeatMissed(err error) {
+// 	logger.Logger.Info("Heartbeat missed")
+// 	if mc.MQTTClient.IsConnected() {
+// 		logger.Logger.Info("Heartbeat missed: disconnecting")
+// 		mc.MQTTClient.Disconnect(0)
+// 	}
+// 	logger.Logger.Info("Heartbeat missed: connecting again")
+// 	mc.start()
+// }
 
 func (mc *MQTTClient) setConfigurationDefaults() {
 	viper.SetDefault("mqttserver.host", "localhost")
@@ -116,11 +118,12 @@ func (mc *MQTTClient) start() {
 
 	opts.SetUsername(viper.GetString("mqttserver.user"))
 	opts.SetPassword(viper.GetString("mqttserver.pass"))
-	opts.SetKeepAlive(3 * time.Second)
-	opts.SetPingTimeout(5 * time.Second)
+	opts.SetKeepAlive(15 * time.Second)
+	opts.SetPingTimeout(60 * time.Second)
 	opts.SetMaxReconnectInterval(30 * time.Second)
 	opts.SetOnConnectHandler(mc.hasConnected)
-	opts.SetAutoReconnect(false)
+	opts.SetConnectTimeout(30 * time.Second)
+	opts.SetAutoReconnect(true)
 	mc.MQTTClient = mqtt.NewClient(opts)
 
 	c := mc.MQTTClient
