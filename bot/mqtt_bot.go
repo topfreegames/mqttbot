@@ -102,7 +102,13 @@ func (b *MQTTBot) StartBot() {
 				MessagePattern: pMap[string("messagePattern")].(string),
 			})
 		}
-		client.Unsubscribe(topic)
+
+		for i := 0; i < 10; i++ {
+			if tokenUnsubscribe := client.Unsubscribe(topic); tokenUnsubscribe.Wait() && tokenUnsubscribe.Error() != nil {
+				logger.Logger.Info(tokenUnsubscribe.Error())
+			}
+		}
+
 		if token := client.Subscribe(topic, uint8(qos), h); token.Wait() && token.Error() != nil {
 			logger.Logger.Fatal(token.Error())
 		}

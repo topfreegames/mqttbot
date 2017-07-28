@@ -8,12 +8,13 @@ services:
     networks:
       - mosqnet
   mosquitto:
-    image: jllopis/mosquitto:v1.4.9
+    image: erlio/docker-vernemq
     ports:
       - "1883:1883"
     environment:
       - DOMAIN=example.local
       - PORT=8080
+      - DOCKER_VERNEMQ_ALLOW_ANONYMOUS=on
     networks:
       - mosqnet
     depends_on:
